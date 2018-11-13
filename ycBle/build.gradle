@@ -1,0 +1,52 @@
+apply plugin: "com.android.library"
+apply plugin: "com.github.dcendents.android-maven"
+
+
+group = "com.github.nopointer"
+
+android {
+
+    compileSdkVersion var.compileSdkVersion
+    buildToolsVersion var.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion var.minSdkVersion
+        targetSdkVersion var.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+
+    buildTypes {
+//        release {
+//            postprocessing {
+//                removeUnusedCode false
+//                removeUnusedResources false
+//                obfuscate false
+//                optimizeCode false
+//                proguardFile "proguard-rules.pro"
+//            }
+//        }
+    }
+
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    //自带的依赖
+
+//    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
+
+    //dfu nordic
+    api 'no.nordicsemi.android:dfu:1.6.1'
+
+
+}
