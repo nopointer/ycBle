@@ -21,22 +21,17 @@ android {
 
 
     buildTypes {
-//        release {
-//            postprocessing {
-//                removeUnusedCode false
-//                removeUnusedResources false
-//                obfuscate false
-//                optimizeCode false
-//                proguardFile "proguard-rules.pro"
-//            }
-//        }
+        release {
+            postprocessing {
+                removeUnusedCode false
+                removeUnusedResources false
+                obfuscate false
+                optimizeCode false
+                proguardFile "proguard-rules.pro"
+            }
+        }
     }
 
-
-    compileOptions {
-        targetCompatibility JavaVersion.VERSION_1_8
-        sourceCompatibility JavaVersion.VERSION_1_8
-    }
 
 }
 
