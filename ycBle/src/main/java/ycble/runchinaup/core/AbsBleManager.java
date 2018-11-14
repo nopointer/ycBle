@@ -151,11 +151,15 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
      * @param timeOutSecond 扫描超时时间 单位秒，0 表示一直扫描
      */
     public void scanAndConn(final String mac, int timeOutSecond) {
-        if (isConn) {
-            ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
+        if (!isBLeEnabled()) {
+            ycBleLog.e("蓝牙没有打开呢！");
             return;
         }
-        bleScaner.stopScan();
+        if (isConn) {
+            ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
+            bleScaner.stopScan();
+            return;
+        }
         if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
             ycBleLog.e("你tm是个逗比嘛，mac地址都不对,地址要注意大写,且不能为空！！！！！");
             return;
@@ -184,6 +188,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         hasScanDevice = false;
         bleScaner.setBleDeviceFilter(null);
         bleScaner.registerScanListener(this);
+        withBleConnState(BleConnState.SEARCH_ING);
         bleScaner.startScan();
         if (timeOutSecond == 0) return;
         handler.sendEmptyMessageDelayed(MSG_AFTER_SCAN_TIMEOUT, timeOutSecond * 1000);
@@ -411,14 +416,12 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         //如果没有结束任务
         if (isConn()) {
             //如果是连接中的
-            if (isConn()) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        toNextTask();
-                    }
-                }, time);
-            }
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toNextTask();
+                }
+            }, time);
         }
     }
 

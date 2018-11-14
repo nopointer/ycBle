@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.text.TextUtils;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import ycble.runchinaup.log.ycBleLog;
@@ -16,9 +17,26 @@ import ycble.runchinaup.util.BleUtil;
  */
 public class BleDevice implements Serializable {
 
+
+    //设备自定义数据
+    public static final String adv_manufacturer_data = "FF";
+    //十六位的serviceUUID
+    public static final String adv_serviceUUID_16bit = "03";
+    //设备的简写名称
+    public static final String adv_name_short = "08";
+    //设备的完整名称
+    public static final String adv_name_length = "09";
+
+
     public BleDevice(String name, String mac) {
         this.name = name;
         this.mac = mac;
+    }
+
+    public BleDevice(String name, String mac, byte[] scanBytes) {
+        this.name = name;
+        this.mac = mac;
+        this.scanBytes = scanBytes;
     }
 
     //设备的mac地址
@@ -28,6 +46,8 @@ public class BleDevice implements Serializable {
     //设备的rssi
     private int rssi;
     //设备的广播数据
+    private byte[] scanBytes;
+
     private String scanHexStr;
 
 
@@ -55,34 +75,35 @@ public class BleDevice implements Serializable {
         this.rssi = rssi;
     }
 
-    public String getScanHexStr() {
-        return scanHexStr;
+    public byte[] getScanBytes() {
+        return scanBytes;
     }
 
-    public void setScanHexStr(String scanHexStr) {
-        this.scanHexStr = scanHexStr;
+    public void setScanBytes(byte[] scanBytes) {
+        this.scanBytes = scanBytes;
     }
 
     //解析蓝牙广播数据
     public synchronized static BleDevice parserFromScanData(BluetoothDevice device, byte[] scanData, int rssi) {
-        BleDevice result = new BleDevice(device.getName(), device.getAddress());
+        BleDevice result = new BleDevice(device.getName(), device.getAddress(), scanData);
         result.setRssi(rssi);
-        result.setScanHexStr(BleUtil.byte2HexStr(scanData));
+        ycBleLog.e(result.toString());
         return result;
     }
 
 
-    public String getAdvName() {
-        if (getAdvData() == null || !getAdvData().containsKey(adv_name_length) || TextUtils.isEmpty(getAdvData().get(adv_name_length))) {
+    private String getAdvName() {
+        HashMap<String, String> getAdvData = getAdvData();
+        if (getAdvData == null || !getAdvData.containsKey(adv_name_length) || TextUtils.isEmpty(getAdvData.get(adv_name_length))) {
             return "null";
         } else {
-            String nameHexStr = getAdvData().get(adv_name_length);
+            String nameHexStr = getAdvData.get(adv_name_length);
             String advName = new String(BleUtil.hexStr2Byte(nameHexStr));
             return advName;
         }
     }
 
-    public HashMap<String, String> getAdvData() {
+    private HashMap<String, String> getAdvData() {
         scanHexStr = scanHexStr.replace(" ", "");
         // advStr = tmp;
         // 先判断长度,如果长度小于1，或者大于124（62个字节）
@@ -131,21 +152,6 @@ public class BleDevice implements Serializable {
     }
 
 
-    //设备自定义数据
-    public static final String adv_manufacturer_data = "FF";
-    //十六位的serviceUUID
-    public static final String adv_serviceUUID_16bit = "03";
-    //设备的简写名称
-    public static final String adv_name_short = "08";
-    //设备的完整名称
-    public static final String adv_name_length = "09";
-
-
-    //获取广播中得某个数据，可能会返回null
-    public String getAvdData(String advName) {
-        return getAdvData().get(advName);
-    }
-
     //创建一个调试设备，用于调试
     public static BleDevice createADebugDeice(String mac) {
         return new BleDevice("debug", mac);
@@ -157,7 +163,7 @@ public class BleDevice implements Serializable {
                 "mac='" + mac + '\'' +
                 ", name='" + name + '\'' +
                 ", rssi=" + rssi +
-                ", scanHexStr='" + scanHexStr + '\'' +
+                ", scanBytes=" + Arrays.toString(scanBytes) +
                 '}';
     }
 }

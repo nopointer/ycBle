@@ -71,8 +71,8 @@ public final class NPContactsUtil {
             npContactInfoList.clear();
             npContactInfoList.addAll(tmpList);
             tmpList.clear();
-        } catch (SecurityException e) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

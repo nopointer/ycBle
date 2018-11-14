@@ -110,7 +110,7 @@ public class BleScaner {
 
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     @Override
-                    public void onScanResult(int callbackType, ScanResult result) {
+                    public void onScanResult(int callbackType, final ScanResult result) {
                         super.onScanResult(callbackType, result);
                         cachedThreadPool.execute(new Runnable() {
                             @Override
@@ -161,7 +161,7 @@ public class BleScaner {
         if (scanCallback43 == null) {
             scanCallback43 = new BluetoothAdapter.LeScanCallback() {
                 @Override
-                public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
                     cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
