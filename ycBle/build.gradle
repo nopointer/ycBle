@@ -13,7 +13,7 @@ android {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "beta_0.0.02"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

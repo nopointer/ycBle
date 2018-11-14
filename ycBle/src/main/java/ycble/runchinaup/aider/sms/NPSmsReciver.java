@@ -37,20 +37,33 @@ public class NPSmsReciver extends BroadcastReceiver {
 
     private static String strLastContent = null;
 
+    /**
+     * 操蛋的方法 每个地方最好都判断一次吧 金立的烂手机就会空指针异常
+     *
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
-        ycBleLog.e("debug_sms" + "短信来了===>");
+        ycBleLog.e("debug sms" + "短信来了===>");
         Bundle bundle = intent.getExtras();
         SmsMessage msg = null;
         if (null != bundle) {
             Object[] smsObj = (Object[]) bundle.get("pdus");
-            for (Object object : smsObj) {
-                msg = SmsMessage.createFromPdu((byte[]) object);
-                String number = msg.getOriginatingAddress();
-                String messageContent = msg.getDisplayMessageBody();
-                if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContent)) {
-                    strLastContent = messageContent;
-                    MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), new String(messageContent));
+            if (null != smsObj) {
+                for (Object object : smsObj) {
+                    msg = SmsMessage.createFromPdu((byte[]) object);
+                    if (null != msg) {
+                        String number = msg.getOriginatingAddress();
+                        String messageContent = msg.getDisplayMessageBody();
+                        if (null == number || null == messageContent || TextUtils.isEmpty(number) || TextUtils.isEmpty(messageContent)) {
+                            return;
+                        }
+                        if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContent)) {
+                            strLastContent = messageContent;
+                            MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), new String(messageContent));
+                        }
+                    }
                 }
             }
         }

@@ -14,6 +14,8 @@ import android.support.annotation.RequiresApi;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ycble.runchinaup.core.callback.ScanListener;
 import ycble.runchinaup.device.BleDevice;
@@ -28,6 +30,9 @@ import static ycble.runchinaup.BleCfg.npBleTag;
  */
 
 public class BleScaner {
+
+    //线程池
+    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(10);
 
     //========================================
     //  单例模板              =================
@@ -106,17 +111,22 @@ public class BleScaner {
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onScanResult(int callbackType, ScanResult result) {
-
                         super.onScanResult(callbackType, result);
-                        if (bleDeviceFilter != null) {
-                            BleDevice bleDevice = bleDeviceFilter.parserDevice(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
-                            if (bleDeviceFilter.filter(bleDevice)) {
-                                onScan(bleDevice);
+                        cachedThreadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                ycBleLog.e("====onScanResult====>" + result.toString() + (bleDeviceFilter == null));
+                                if (bleDeviceFilter != null) {
+                                    BleDevice bleDevice = bleDeviceFilter.parserDevice(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
+                                    if (bleDeviceFilter.filter(bleDevice)) {
+                                        onScan(bleDevice);
+                                    }
+                                } else {
+                                    BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
+                                    onScan(bleDevice);
+                                }
                             }
-                        } else {
-                            BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
-                            onScan(bleDevice);
-                        }
+                        });
                     }
 
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -140,6 +150,7 @@ public class BleScaner {
                     @Override
                     public void onScanFailed(int errorCode) {
                         super.onScanFailed(errorCode);
+                        ycBleLog.e("onScanFailed====>" + errorCode);
                     }
                 };
             }
@@ -151,16 +162,20 @@ public class BleScaner {
             scanCallback43 = new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-                    if (bleDeviceFilter != null) {
-                        BleDevice bleDevice = bleDeviceFilter.parserDevice(device, scanRecord, rssi);
-                        if (bleDeviceFilter.filter(bleDevice)) {
-                            onScan(bleDevice);
+                    cachedThreadPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (bleDeviceFilter != null) {
+                                BleDevice bleDevice = bleDeviceFilter.parserDevice(device, scanRecord, rssi);
+                                if (bleDeviceFilter.filter(bleDevice)) {
+                                    onScan(bleDevice);
+                                }
+                            } else {
+                                BleDevice bleDevice = (BleDevice) BleDevice.parserFromScanData(device, scanRecord, rssi);
+                                onScan(bleDevice);
+                            }
                         }
-                    } else {
-                        BleDevice bleDevice = (BleDevice) BleDevice.parserFromScanData(device, scanRecord, rssi);
-                        onScan(bleDevice);
-                    }
+                    });
                 }
             };
         }
@@ -226,6 +241,7 @@ public class BleScaner {
 
 
     private void onScan(BleDevice bleDevice) {
+        ycBleLog.e("===处理回调===>" + scanListenerHashSet.size());
         for (ScanListener scanListener : scanListenerHashSet) {
             scanListener.onScan(bleDevice);
         }

@@ -317,7 +317,9 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         return isConn;
     }
 
-    //清除某些状态，比如任务队列
+    /**
+     * 清除某些状态，比如任务队列,和上次的消息队列
+     */
     private final void clearSomeFlag() {
         bleUnitTaskList.clear();
         bleUnitTaskIndex = -1;
@@ -387,13 +389,18 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
     }
 
+    /**
+     * 处理连接后的时序任务
+     */
     private final synchronized void handWithCfg() {
         bleUnitTaskIndex = -1;
         isTaskFinish = false;
         bleTaskSize = bleUnitTaskList.size();
+        //如果有任务队列，就执行任务队列
         if (bleUnitTaskIndex < bleTaskSize) {
             toNextTask();
         } else {
+            //如果没有任务队列，直接直接结束任务
             setTaskFinish();
         }
     }
@@ -401,13 +408,17 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
     protected synchronized void taskSuccess(int time) {
         clearTimeOutHandler(false);
+        //如果没有结束任务
         if (isConn()) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    toNextTask();
-                }
-            }, time);
+            //如果是连接中的
+            if (isConn()) {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toNextTask();
+                    }
+                }, time);
+            }
         }
     }
 
@@ -417,9 +428,9 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
     //执行下一次任务
     private synchronized void toNextTask() {
+        if (absBleConnManger == null) return;
         bleTaskSize = bleUnitTaskList.size();
         bleUnitTaskIndex++;
-        if (absBleConnManger == null) return;
         if (bleUnitTaskIndex < bleTaskSize) {
             ycBleLog.e("ble===task====>" + (bleUnitTaskIndex + 1) + "/" + bleTaskSize);
             BleUnitTask unitTask = bleUnitTaskList.get(bleUnitTaskIndex);
@@ -525,6 +536,10 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         }
 
 
+        /**
+         * 在检测到service后，可以执行的操作
+         * @param gatt
+         */
         @Override
         protected void onLoadCharas(BluetoothGatt gatt) {
             //先写数据下去 (写的一些配置信息)
@@ -574,7 +589,6 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         @Override
         public void onBleState(BleStateReceiver.SystemBluetoothState systemBluetoothState, BluetoothDevice bluetoothDevice) {
 
-
             if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateOffBle) {
                 ycBleLog.e("debug===蓝牙关闭，也算手动断开===>");
                 isConnectIng = false;
@@ -592,7 +606,6 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
                 timeOutHelperHashMap.clear();
                 if (absBleConnManger.isHandDisConn()) {
                     ycBleLog.e("debug===手动断开连接");
-
                     withOnHandDisConn();
                     onHandDisConn();
                 } else {
@@ -688,6 +701,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
     @Override
     public void onScan(final BleDevice bleDevice) {
+        ycBleLog.e("扫描到了设备,handler里面发送消息==>" + bleDevice.toString());
         handler.sendMessage(handler.obtainMessage(MSG_SCAN_DEVICE, bleDevice));
     }
 

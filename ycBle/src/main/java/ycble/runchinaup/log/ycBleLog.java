@@ -31,13 +31,8 @@ import ycble.runchinaup.aider.AiderHelper;
 import ycble.runchinaup.util.PhoneDeviceUtil;
 
 /**
- * Log工具，类似android.util.Log。
- * tag自动产生，格式: customTagPrefix:className.methodName(L:lineNumber),
- * customTagPrefix为空时只输出：className.methodName(L:lineNumber)。
- * <p/>
- * Date: 13-7-24
- * Time: 下午12:23
- * 最后修改日期 2018-11-7 11：52
+ * ble日志输出管理工具
+ * 最后修改日期np 2018-11-7 11：52
  */
 public class ycBleLog {
 

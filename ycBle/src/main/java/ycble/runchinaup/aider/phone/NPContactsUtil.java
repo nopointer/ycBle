@@ -50,13 +50,14 @@ public final class NPContactsUtil {
             tmpList.clear();
             Uri uri = Data.CONTENT_URI; // 联系人Uri；
             Cursor cursor = context.getContentResolver().query(uri, null, null, null, Data.RAW_CONTACT_ID);
+            if (cursor == null) return;
             while (cursor.moveToNext()) {
-                String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
-                if (!mimeType.equals(phoneDataMimeType)) {
-                    continue;
-                }
-//            debugCursor(cursor);
                 try {
+//                    debugCursor(cursor);
+                    String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
+                    if (!mimeType.equals(phoneDataMimeType)) {
+                        continue;
+                    }
                     String display_name_alt = cursor.getString(cursor.getColumnIndex("display_name_alt"));
                     String display_name = cursor.getString(cursor.getColumnIndex("display_name"));
                     String data1 = cursor.getString(cursor.getColumnIndex("data1"));
