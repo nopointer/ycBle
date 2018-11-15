@@ -32,6 +32,12 @@ public class DfuHelper {
     private OTACallback otaCallback = null;
 
     public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback) {
+        ycBleLog.e("context===>" + context);
+        ycBleLog.e("zipFilePath===>" + zipFilePath);
+        ycBleLog.e("mac===>" + mac);
+        ycBleLog.e("name===>" + name);
+        ycBleLog.e("otaCallback===>" + otaCallback);
+
         this.otaCallback = otaCallback;
         final DfuServiceInitiator starter = new DfuServiceInitiator(mac)
                 .setDeviceName(name)
@@ -77,19 +83,19 @@ public class DfuHelper {
 
         }
 //
-//        @Override
-//        public void onFirmwareValidating(final String deviceAddress) {
-////            mProgressBar.setIndeterminate(true);
-////            mTextPercentage.setText(R.string.dfu_status_validating);
-//            ycBleLog.e("R.string.dfu_status_validating");
-//        }
-
-//        @Override
-//        public void onDeviceDisconnecting(final String deviceAddress) {
-////            mProgressBar.setIndeterminate(true);
-////            mTextPercentage.setText(R.string.dfu_status_disconnecting);
-//            ycBleLog.e("R.string.dfu_status_disconnecting");
-//        }
+        @Override
+        public void onFirmwareValidating(final String deviceAddress) {
+//            mProgressBar.setIndeterminate(true);
+//            mTextPercentage.setText(R.string.dfu_status_validating);
+            ycBleLog.e("R.string.dfu_status_validating");
+        }
+//
+        @Override
+        public void onDeviceDisconnecting(final String deviceAddress) {
+//            mProgressBar.setIndeterminate(true);
+//            mTextPercentage.setText(R.string.dfu_status_disconnecting);
+            ycBleLog.e("R.string.dfu_status_disconnecting");
+        }
 
         @Override
         public void onDfuCompleted(final String deviceAddress) {
@@ -102,7 +108,7 @@ public class DfuHelper {
         @Override
         public void onDfuAborted(final String deviceAddress) {
             ycBleLog.e("R.string.dfu_status_aborted");
-            
+
             if (otaCallback != null) {
                 otaCallback.onFailure("");
             }

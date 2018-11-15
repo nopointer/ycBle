@@ -12,8 +12,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 4
-        versionName "beta_0.0.04"
+        versionCode 5
+        versionName "beta_0.0.05"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
