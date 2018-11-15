@@ -12,8 +12,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 3
-        versionName "beta_0.0.03"
+        versionCode 4
+        versionName "beta_0.0.04"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -21,15 +21,15 @@ android {
 
 
     buildTypes {
-        release {
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode false
-                proguardFile "proguard-rules.pro"
-            }
-        }
+//        release {
+//            postprocessing {
+//                removeUnusedCode false
+//                removeUnusedResources false
+//                obfuscate false
+//                optimizeCode false
+//                proguardFile "proguard-rules.pro"
+//            }
+//        }
     }
 
 
