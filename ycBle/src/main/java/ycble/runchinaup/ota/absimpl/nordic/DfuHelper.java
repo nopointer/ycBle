@@ -31,7 +31,7 @@ public class DfuHelper {
 
     private OTACallback otaCallback = null;
 
-    public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback,Class dfuServiceImpl) {
+    public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback, Class dfuServiceImpl) {
         this.otaCallback = otaCallback;
         final DfuServiceInitiator starter = new DfuServiceInitiator(mac)
                 .setDeviceName(name)
@@ -42,7 +42,10 @@ public class DfuHelper {
                 .setUnsafeExperimentalButtonlessServiceInSecureDfuEnabled(true);
 
         starter.setZip(zipFilePath);
-
+        if (dfuServiceImpl == null) {
+            ycBleLog.e("dfuServiceImpl cant be null");
+            return;
+        }
         starter.start(context, dfuServiceImpl);
         DfuServiceListenerHelper.registerProgressListener(context, mDfuProgressListener);
     }
@@ -76,14 +79,16 @@ public class DfuHelper {
             }
 
         }
-//
+
+        //
         @Override
         public void onFirmwareValidating(final String deviceAddress) {
 //            mProgressBar.setIndeterminate(true);
 //            mTextPercentage.setText(R.string.dfu_status_validating);
             ycBleLog.e("R.string.dfu_status_validating");
         }
-//
+
+        //
         @Override
         public void onDeviceDisconnecting(final String deviceAddress) {
 //            mProgressBar.setIndeterminate(true);
