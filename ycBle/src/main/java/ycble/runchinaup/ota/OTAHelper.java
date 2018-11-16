@@ -22,10 +22,10 @@ public class OTAHelper {
     /**
      * 设置DfuService
      */
-    public DfuBaseService dfuBaseServiceImpl;
+    public Class<? extends DfuBaseService> dfuBaseService;
 
-    public void setDfuBaseServiceImpl(DfuBaseService dfuBaseServiceImpl) {
-        this.dfuBaseServiceImpl = dfuBaseServiceImpl;
+    public void setDfuBaseService(Class<? extends DfuBaseService> dfuBaseService) {
+        this.dfuBaseService = dfuBaseService;
     }
 
     private OTAHelper() {
@@ -44,7 +44,7 @@ public class OTAHelper {
         switch (firmType) {
             case NORDIC:
             default:
-                DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseServiceImpl.getClass());
+                DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseService);
                 break;
         }
     }
