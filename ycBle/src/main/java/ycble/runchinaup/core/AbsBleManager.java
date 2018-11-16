@@ -156,11 +156,11 @@ public abstract class AbsBleManager implements ConnScanListener {
         }
         if (isConn) {
             ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
-            myBleScaner.stopScan();
+            myBleScaner.stopScanForConn();
             return;
         }
         if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
-            ycBleLog.e("你tm是个逗比嘛，mac地址都不对,地址要注意大写,且不能为空！！！！！");
+            ycBleLog.e("mac地址都不对,地址要注意大写,且不能为空！！！！！");
             return;
         }
         if (!TextUtils.isEmpty(connMac) && !mac.equals(connMac)) {
@@ -704,19 +704,18 @@ public abstract class AbsBleManager implements ConnScanListener {
 
     @Override
     public void scanMyDevice(final BleDevice bleDevice) {
+        if (bleDevice == null) return;
+        if (TextUtils.isEmpty(connMac)) return;
         ycBleLog.e("扫描到了设备,handler里面发送消息==>" + bleDevice.toString());
         handler.sendMessage(handler.obtainMessage(MSG_SCAN_DEVICE, bleDevice));
     }
 
 
     private synchronized void handScanDevice(final BleDevice bleDevice) {
-        if (bleDevice == null) return;
-        if (TextUtils.isEmpty(connMac)) return;
-        ycBleLog.e("====>扫描到了===>" + bleDevice.toString());
         if (bleDevice.getMac().equals(connMac)) {
             if (!hasScanDevice) {
                 hasScanDevice = true;
-                myBleScaner.stopScan();
+                myBleScaner.stopScanForConn();
                 handler.removeMessages(MSG_SCAN_DEVICE);
                 myBleScaner.setConnScanListener(null);
                 handler.postDelayed(new Runnable() {
@@ -764,7 +763,7 @@ public abstract class AbsBleManager implements ConnScanListener {
                     handler.removeMessages(MSG_SCAN_DEVICE);
                     if (!hasScanDevice) {
                         myBleScaner.setConnScanListener(null);
-                        myBleScaner.stopScan();
+                        myBleScaner.stopScanForConn();
                         ycBleLog.e("设备都不在附近 你连接个锤子，连接失败");
                         withBleConnState(BleConnState.CONNFAILURE);
                     }
