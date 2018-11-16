@@ -32,12 +32,6 @@ public class DfuHelper {
     private OTACallback otaCallback = null;
 
     public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback) {
-        ycBleLog.e("context===>" + context);
-        ycBleLog.e("zipFilePath===>" + zipFilePath);
-        ycBleLog.e("mac===>" + mac);
-        ycBleLog.e("name===>" + name);
-        ycBleLog.e("otaCallback===>" + otaCallback);
-
         this.otaCallback = otaCallback;
         final DfuServiceInitiator starter = new DfuServiceInitiator(mac)
                 .setDeviceName(name)

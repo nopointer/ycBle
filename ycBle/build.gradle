@@ -12,36 +12,22 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 6
-        versionName "beta_0.0.06"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        versionCode 7
+        versionName "beta_0.0.07"
     }
 
-
     buildTypes {
-//        release {
-//            postprocessing {
-//                removeUnusedCode false
-//                removeUnusedResources false
-//                obfuscate false
-//                optimizeCode false
-//                proguardFile "proguard-rules.pro"
-//            }
-//        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 
 
 }
 
 dependencies {
-    //自带的依赖
-
 //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
-
     //dfu nordic
-    implementation 'no.nordicsemi.android:dfu:1.6.1'
-
-
+    api 'no.nordicsemi.android:dfu:1.6.1'
 }
