@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,29 +39,20 @@ public class BleScaner {
     //  单例模板              =================
     //========================================
 
+    //是否是可以回调回去得
+    private boolean isCallbackFlag = false;
+
     private BleScaner() {
         init();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
             if (bluetoothLeScanner == null) {
                 bluetoothLeScanner = adapter.getBluetoothLeScanner();
             }
             if (scanSettings == null) {
                 ScanSettings.Builder builder = new ScanSettings.Builder();
                 builder.setScanMode(SCAN_MODE_LOW_LATENCY);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    builder.setMatchMode(MATCH_MODE_AGGRESSIVE);
-//                    builder.setCallbackType(CALLBACK_TYPE_FIRST_MATCH);
-//                }
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    builder.setLegacy(true);
-//                    builder.setPhy(PHY_LE_ALL_SUPPORTED);
-//                }
                 scanSettings = builder.build();
-//                new ScanSettings.Builder().setScanMode()
-//                        .setReportDelay(0)
-//                        .setMatchMode(1)
-//                        .setCallbackType(1)
-//                        .build();
             }
         }
     }
@@ -116,14 +108,18 @@ public class BleScaner {
                             @Override
                             public void run() {
                                 ycBleLog.e("====onScanResult====>" + result.toString() + (bleDeviceFilter == null));
-                                if (bleDeviceFilter != null) {
-                                    BleDevice bleDevice = bleDeviceFilter.parserDevice(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
-                                    if (bleDeviceFilter.filter(bleDevice)) {
+                                BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
+                                if (isCallbackFlag) {
+                                    if (bleDeviceFilter != null) {
+                                        if (bleDeviceFilter.filter(bleDevice)) {
+                                            onScan(bleDevice);
+                                        }
+                                    } else {
                                         onScan(bleDevice);
                                     }
-                                } else {
-                                    BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
-                                    onScan(bleDevice);
+                                }
+                                if (!TextUtils.isEmpty(scanForMyDeviceMac) && bleDevice.getMac().equals(scanForMyDeviceMac) && connScanListener != null) {
+                                    connScanListener.scanMyDevice(bleDevice);
                                 }
                             }
                         });
@@ -135,13 +131,12 @@ public class BleScaner {
                         super.onBatchScanResults(results);
                         ycBleLog.e("====onBatchScanResults====>" + results.size());
                         for (ScanResult result : results) {
+                            BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                             if (bleDeviceFilter != null) {
-                                BleDevice bleDevice = bleDeviceFilter.parserDevice(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                                 if (bleDeviceFilter.filter(bleDevice)) {
                                     onScan(bleDevice);
                                 }
                             } else {
-                                BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                                 onScan(bleDevice);
                             }
                         }
@@ -165,14 +160,18 @@ public class BleScaner {
                     cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (bleDeviceFilter != null) {
-                                BleDevice bleDevice = bleDeviceFilter.parserDevice(device, scanRecord, rssi);
-                                if (bleDeviceFilter.filter(bleDevice)) {
+                            BleDevice bleDevice = BleDevice.parserFromScanData(device, scanRecord, rssi);
+                            if (isCallbackFlag) {
+                                if (bleDeviceFilter != null) {
+                                    if (bleDeviceFilter.filter(bleDevice)) {
+                                        onScan(bleDevice);
+                                    }
+                                } else {
                                     onScan(bleDevice);
                                 }
-                            } else {
-                                BleDevice bleDevice = (BleDevice) BleDevice.parserFromScanData(device, scanRecord, rssi);
-                                onScan(bleDevice);
+                            }
+                            if (!TextUtils.isEmpty(scanForMyDeviceMac) && bleDevice.getMac().equals(scanForMyDeviceMac) && connScanListener != null) {
+                                connScanListener.scanMyDevice(bleDevice);
                             }
                         }
                     });
@@ -190,17 +189,19 @@ public class BleScaner {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
             return;
         }
-        ycBleLog.e("要求开始扫描设备");
+        ycBleLog.e("要求开始扫描设备,当前扫描状态:" + isScan);
+        isCallbackFlag = true;
         if (!isScan) {
+            ycBleLog.e("======>真实开始扫描设备===>");
             if (Build.VERSION.SDK_INT < 21) {
                 adapter.startLeScan(scanCallback43);
             } else {
-                ycBleLog.e("======>扫描设备===>");
                 bluetoothLeScanner.startScan(null, scanSettings, scanCallback50);
             }
             isScan = true;
         }
     }
+
 
     public void stopScan() {
         init();
@@ -208,15 +209,12 @@ public class BleScaner {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
             return;
         }
-        ycBleLog.e("要求停止扫描设备");
-        if (isScan) {
-            if (Build.VERSION.SDK_INT < 21) {
-                adapter.stopLeScan(scanCallback43);
-            } else {
-                bluetoothLeScanner.stopScan(scanCallback50);
-            }
-            isScan = false;
+        isCallbackFlag = false;
+        ycBleLog.e("要求停止扫描设备,但是如果连接管理里面还有设备的话，就不能停止扫描了");
+        if (scanForMyDeviceMac != null && !TextUtils.isEmpty(scanForMyDeviceMac)) {
+            return;
         }
+        stopCode();
     }
 
 
@@ -246,5 +244,48 @@ public class BleScaner {
             scanListener.onScan(bleDevice);
         }
     }
+
+
+    //针对连接的回调，不需要个普通扫描去做切换了
+    private ConnScanListener connScanListener = null;
+
+    protected void setConnScanListener(ConnScanListener connScanListener) {
+        this.connScanListener = connScanListener;
+    }
+
+    //针对我的设备的mac地址
+    private String scanForMyDeviceMac = null;
+
+    public void setScanForMyDeviceMac(String scanForMyDeviceMac) {
+        this.scanForMyDeviceMac = scanForMyDeviceMac;
+    }
+
+
+    //连接的扫描 不影响普通的扫描
+    protected void startScanForConn() {
+        init();
+        if (!isEnabled()) {
+            ycBleLog.w(npBleTag + " 蓝牙没有打开--");
+            return;
+        }
+        ycBleLog.e("要求开始扫描设备,只为连接服务,当前扫描状态:" + isScan);
+        stopCode();
+    }
+
+    /**
+     * 扫描的代码，复用
+     */
+    private void stopCode() {
+        if (!isScan) {
+            ycBleLog.e("======>真实停止扫描设备===>");
+            if (Build.VERSION.SDK_INT < 21) {
+                adapter.startLeScan(scanCallback43);
+            } else {
+                bluetoothLeScanner.startScan(null, scanSettings, scanCallback50);
+            }
+            isScan = true;
+        }
+    }
+
 
 }

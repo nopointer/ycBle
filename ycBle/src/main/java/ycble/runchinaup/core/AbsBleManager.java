@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 
 import ycble.runchinaup.core.callback.BleConnCallback;
-import ycble.runchinaup.core.callback.ScanListener;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.exception.BleUUIDNullException;
 import ycble.runchinaup.log.ycBleLog;
@@ -27,7 +26,7 @@ import static ycble.runchinaup.BleCfg.npBleTag;
  * 具体操作蓝牙交互的管理器
  */
 
-public abstract class AbsBleManager implements ScanListener<BleDevice> {
+public abstract class AbsBleManager implements ConnScanListener {
 
     /**
      * mac地址的正则匹配表达式
@@ -38,7 +37,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
     //蓝牙抽象的管理器
 
     //蓝牙扫描器
-    public BleScaner bleScaner = BleScaner.getBleScaner();
+    public BleScaner myBleScaner = BleScaner.getBleScaner();
 
     private AbsBleConnManger absBleConnManger = null;
 
@@ -73,7 +72,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
     //蓝牙开关是否是打开的
     public boolean isBLeEnabled() {
-        return bleScaner.isEnabled();
+        return myBleScaner.isEnabled();
     }
 
     //任务是否已经结束了
@@ -157,7 +156,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         }
         if (isConn) {
             ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
-            bleScaner.stopScan();
+            myBleScaner.stopScan();
             return;
         }
         if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
@@ -186,10 +185,10 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         }
         ycBleLog.e("debug===扫描然后再连接我的设备===>超时时间:" + timeOutSecond);
         hasScanDevice = false;
-        bleScaner.setBleDeviceFilter(null);
-        bleScaner.registerScanListener(this);
+        myBleScaner.setScanForMyDeviceMac(mac);
+        myBleScaner.setConnScanListener(this);
         withBleConnState(BleConnState.SEARCH_ING);
-        bleScaner.startScan();
+        myBleScaner.startScanForConn();
         if (timeOutSecond == 0) return;
         handler.sendEmptyMessageDelayed(MSG_AFTER_SCAN_TIMEOUT, timeOutSecond * 1000);
     }
@@ -210,6 +209,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
     public void disConn() {
         clearSomeFlag();
         connMac = null;
+        myBleScaner.setScanForMyDeviceMac(null);
         isConnectIng = false;
         if (absBleConnManger != null) {
             absBleConnManger.disConnect();
@@ -703,7 +703,7 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
 
 
     @Override
-    public void onScan(final BleDevice bleDevice) {
+    public void scanMyDevice(final BleDevice bleDevice) {
         ycBleLog.e("扫描到了设备,handler里面发送消息==>" + bleDevice.toString());
         handler.sendMessage(handler.obtainMessage(MSG_SCAN_DEVICE, bleDevice));
     }
@@ -716,9 +716,9 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
         if (bleDevice.getMac().equals(connMac)) {
             if (!hasScanDevice) {
                 hasScanDevice = true;
-                bleScaner.stopScan();
+                myBleScaner.stopScan();
                 handler.removeMessages(MSG_SCAN_DEVICE);
-                bleScaner.unRegisterScanListener(AbsBleManager.this);
+                myBleScaner.setConnScanListener(null);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -763,8 +763,8 @@ public abstract class AbsBleManager implements ScanListener<BleDevice> {
                     //担心会有在结束扫描的时候，同时又扫描到设备了，移除扫描到的消息
                     handler.removeMessages(MSG_SCAN_DEVICE);
                     if (!hasScanDevice) {
-                        bleScaner.unRegisterScanListener(AbsBleManager.this);
-                        bleScaner.stopScan();
+                        myBleScaner.setConnScanListener(null);
+                        myBleScaner.stopScan();
                         ycBleLog.e("设备都不在附近 你连接个锤子，连接失败");
                         withBleConnState(BleConnState.CONNFAILURE);
                     }
