@@ -26,17 +26,18 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
-        <service
-            android:name=".ota.absimpl.nordic.DfuService"
-            android:exported="true"
-            android:label="DfuService">
-            <intent-filter>
-                <action android:name="no.nordicsemi.android.action.DFU_UPLOAD" />
+        <!--<service-->
+            <!--android:name=".ota.absimpl.nordic.DfuService"-->
+            <!--android:exported="false"-->
+            <!--android:enabled="true"-->
+            <!--android:label="DfuService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="no.nordicsemi.android.action.DFU_UPLOAD" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
 
-        <activity android:name=".ota.absimpl.nordic.NotificationActivity" />
+        <!--<activity android:name=".ota.absimpl.nordic.NotificationActivity" />-->
     </application>
 </manifest>

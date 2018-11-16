@@ -2,6 +2,7 @@ package ycble.runchinaup.ota;
 
 import android.content.Context;
 
+import no.nordicsemi.android.dfu.DfuBaseService;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
@@ -16,6 +17,15 @@ public class OTAHelper {
 
     public static OTAHelper getInstance() {
         return ourInstance;
+    }
+
+    /**
+     * 设置DfuService
+     */
+    public DfuBaseService dfuBaseServiceImpl;
+
+    public void setDfuBaseServiceImpl(DfuBaseService dfuBaseServiceImpl) {
+        this.dfuBaseServiceImpl = dfuBaseServiceImpl;
     }
 
     private OTAHelper() {
@@ -34,7 +44,7 @@ public class OTAHelper {
         switch (firmType) {
             case NORDIC:
             default:
-                DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback);
+                DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseServiceImpl.getClass());
                 break;
         }
     }

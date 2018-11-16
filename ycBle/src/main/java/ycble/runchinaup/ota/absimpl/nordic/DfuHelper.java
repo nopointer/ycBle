@@ -31,7 +31,7 @@ public class DfuHelper {
 
     private OTACallback otaCallback = null;
 
-    public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback) {
+    public void start(Context context, String zipFilePath, String mac, String name, OTACallback otaCallback,Class dfuServiceImpl) {
         this.otaCallback = otaCallback;
         final DfuServiceInitiator starter = new DfuServiceInitiator(mac)
                 .setDeviceName(name)
@@ -43,7 +43,7 @@ public class DfuHelper {
 
         starter.setZip(zipFilePath);
 
-        starter.start(context, DfuService.class);
+        starter.start(context, dfuServiceImpl);
         DfuServiceListenerHelper.registerProgressListener(context, mDfuProgressListener);
     }
 
