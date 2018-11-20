@@ -1,5 +1,7 @@
 
 
+2018-11-20 15:04
+     >>>修改了钉钉包名
 2018-11-16 11:47
      >>>nordic的OTA单独处理 需要让具体的项目实现一个DfuService 和NotifyActivity,
      之前是放在moudle里面的 但是一直没有反应，貌似moudle里面的service不能启动

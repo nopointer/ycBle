@@ -57,6 +57,7 @@ public enum MsgType {
                 return Viber;
             case "com.instagram.android":
                 return Instagram;
+            case "com.alibaba.android.rimet":
             case "com.alibaba.android.app.rimet":
                 return DingDind;
         }
