@@ -43,7 +43,7 @@ public enum MsgType {
                 return MsgType.FACEBOOK;
             case "com.twitter.android"://twitter
                 return MsgType.TWITTER;
-            case "jp.naver.line.androi"://line
+            case "jp.naver.line.android"://line
                 return MsgType.LINE;
             case "com.taobao.qianniu"://千牛
                 return MsgType.QIANNIU;
