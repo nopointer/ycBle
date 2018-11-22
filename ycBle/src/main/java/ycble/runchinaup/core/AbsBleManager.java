@@ -210,6 +210,7 @@ public abstract class AbsBleManager implements ConnScanListener {
         clearSomeFlag();
         connMac = null;
         myBleScaner.setScanForMyDeviceMac(null);
+        myBleScaner.stopScanForConn();
         isConnectIng = false;
         if (absBleConnManger != null) {
             absBleConnManger.disConnect();
@@ -591,6 +592,11 @@ public abstract class AbsBleManager implements ConnScanListener {
     private BleStateReceiver.BleStateListener bleStateListener = new BleStateReceiver.BleStateListener() {
         @Override
         public void onBleState(BleStateReceiver.SystemBluetoothState systemBluetoothState, BluetoothDevice bluetoothDevice) {
+
+            if (isOTAMode()) {
+                ycBleLog.e("当前是OTA状态,打印一下状态就好了" + systemBluetoothState + "-" + bluetoothDevice.getAddress());
+
+            }
 
             if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateOffBle) {
                 ycBleLog.e("debug===蓝牙关闭，也算手动断开===>");
