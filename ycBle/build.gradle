@@ -29,5 +29,6 @@ android {
 dependencies {
 //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
     //dfu nordic
-    implementation 'no.nordicsemi.android:dfu:1.6.1'
+//    implementation 'no.nordicsemi.android:dfu:1.6.1'
+    implementation 'no.nordicsemi.android:dfu:1.7.0'
 }
