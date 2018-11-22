@@ -193,7 +193,9 @@ public final class AbsBleConnManger {
                 if (absBleConnCallback != null) {
                     absBleConnCallback.connResult(BleConnState.CONNECTED);
                 }
-
+                ycBleLog.e("先移除所有的关于一次连接的消息队列");
+                hasServicesDiscovered = false;
+                handler.removeCallbacksAndMessages(null);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -202,9 +204,10 @@ public final class AbsBleConnManger {
                             ycBleLog.e("500毫秒后，如果还连接上的，则开始扫描服务");
                             boolean boolResult = bluetoothGatt.discoverServices();
                             ycBleLog.e("discoverServices结果:" + boolResult);
-                            handler.postDelayed(discoverService, 1000);
+                            handler.postDelayed(discoverServiceRunnable, 1000);
                         } else {
-                            handler.removeCallbacksAndMessages(null);
+                            ycBleLog.e("500毫秒后，不再连接是情况，移除discoverService");
+                            handler.removeCallbacks(discoverServiceRunnable);
                         }
                     }
                 }, 500);
@@ -271,7 +274,7 @@ public final class AbsBleConnManger {
                 }
 
                 hasServicesDiscovered = true;
-                handler.removeCallbacks(discoverService);
+                handler.removeCallbacks(discoverServiceRunnable);
 
                 if (count == mustUUIDList.size()) {
                     if (absBleConnCallback != null) {
@@ -575,17 +578,17 @@ public final class AbsBleConnManger {
     }
 
 
-    //延时扫描服务
-    private Runnable discoverService = new Runnable() {
+    /**
+     * 延时扫描ble下的服务
+     */
+    private Runnable discoverServiceRunnable = new Runnable() {
         @Override
         public void run() {
             ycBleLog.e("1000毫秒后，如果还连接上的，检测服务有没有被扫描到");
-            if (isConnected && bluetoothGatt != null) {
-                if (!hasServicesDiscovered) {
-                    ycBleLog.e("服务没有被检测到");
-                } else {
-                    handler.removeCallbacksAndMessages(null);
-                }
+            if (!hasServicesDiscovered) {
+                ycBleLog.e("服务没有被检测到");
+            } else {
+                handler.removeCallbacks(discoverServiceRunnable);
             }
         }
     };
