@@ -2,6 +2,8 @@ package ycble.runchinaup.core;
 
 import android.content.Context;
 
+import ycble.runchinaup.aider.AiderHelper;
+
 public class ycBleSDK {
 
     /**
@@ -11,6 +13,7 @@ public class ycBleSDK {
      */
     public static void initSDK(Context context) {
         AbsBleManager.initSDK(context);
+        AiderHelper.init(context);
     }
 
 }
