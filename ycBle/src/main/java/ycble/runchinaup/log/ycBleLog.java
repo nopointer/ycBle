@@ -27,7 +27,6 @@ import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ycble.runchinaup.aider.AiderHelper;
 import ycble.runchinaup.util.PhoneDeviceUtil;
 
 /**
@@ -190,7 +189,7 @@ public class ycBleLog {
         stringBuilder.append("手机型号:" + PhoneDeviceUtil.getSystemModel()).append("\n");
         stringBuilder.append("安卓版本:" + PhoneDeviceUtil.getSystemVersion()).append("\n");
         stringBuilder.append("语言环境:" + PhoneDeviceUtil.getSystemLanguage()).append("\n");
-        stringBuilder.append("手机IMEI:" + PhoneDeviceUtil.getIMEI(AiderHelper.getContext())).append("\n");
+//        stringBuilder.append("手机IMEI:" + PhoneDeviceUtil.getIMEI(AiderHelper.getContext())).append("\n");
         return stringBuilder.toString();
     }
 
