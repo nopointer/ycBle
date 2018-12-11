@@ -98,10 +98,9 @@ final class NotificationMsgUtil {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(new Intent(context, NPNotificationService.class));
             context.startForegroundService(new Intent(context, NPAccessibilityService.class));
-        } else {
-            context.startService(new Intent(context, NPNotificationService.class));
-            context.startService(new Intent(context, NPAccessibilityService.class));
         }
+        context.startService(new Intent(context, NPNotificationService.class));
+        context.startService(new Intent(context, NPAccessibilityService.class));
     }
 
     public static void stopNotifyService(Context context) {
