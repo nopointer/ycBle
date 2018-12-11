@@ -33,10 +33,21 @@ ext {
     var = [
             // SDK And Tools
             minSdkVersion        : 18,
-            targetSdkVersion     : 26,
+            targetSdkVersion     : 20,
             compileSdkVersion    : 26,
             buildToolsVersion    : "27.0.0",
             //Dependencies
             supportLibraryVersion: "27.0.0"
     ]
+}
+
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+                    && !details.requested.name.contains('multidex') ) {
+                details.useVersion "27.0.0"
+            }
+        }
+    }
 }
