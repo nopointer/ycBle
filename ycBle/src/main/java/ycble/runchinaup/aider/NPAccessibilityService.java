@@ -3,6 +3,7 @@ package ycble.runchinaup.aider;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Notification;
+import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
@@ -28,6 +29,15 @@ public class NPAccessibilityService extends AccessibilityService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForeground(1, new Notification()); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
         }
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(1, new Notification()); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
