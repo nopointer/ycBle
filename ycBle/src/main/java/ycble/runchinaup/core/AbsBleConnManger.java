@@ -375,9 +375,11 @@ public final class AbsBleConnManger {
     public boolean writeData(UUID serViceUUID, UUID charaUUID, byte[] data) throws BleUUIDNullException {
         BluetoothGattService service = getService(serViceUUID);
         BluetoothGattCharacteristic characteristic = getChara(service, charaUUID);
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
         characteristic.setValue(data);
         boolean writeResult = bluetoothGatt.writeCharacteristic(characteristic);
-        ycBleLog.e("write:" + serViceUUID.toString() + "/" + charaUUID.toString() + "/" + writeResult + "{ " + BleUtil.byte2HexStr(data) + " }");
+        String dataLenString = String.format(" [%d] ", data.length);
+        ycBleLog.e("默认写:" + serViceUUID.toString() + "/" + charaUUID.toString() + ">" + dataLenString + writeResult + "< " + BleUtil.byte2HexStr(data) + " >");
         return writeResult;
     }
 
@@ -385,10 +387,11 @@ public final class AbsBleConnManger {
     public boolean writeDataWithOutResponse(UUID serViceUUID, UUID charaUUID, byte[] data) throws BleUUIDNullException {
         BluetoothGattService service = getService(serViceUUID);
         BluetoothGattCharacteristic characteristic = getChara(service, charaUUID);
-        characteristic.setValue(data);
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        characteristic.setValue(data);
         boolean writeResult = bluetoothGatt.writeCharacteristic(characteristic);
-        ycBleLog.e(npBleTag + "->writeWithOutRepsonse:" + serViceUUID.toString() + "/" + charaUUID.toString() + "/" + writeResult + "{ " + BleUtil.byte2HexStr(data) + " }");
+        String dataLenString = String.format(" [%d] ", data.length);
+        ycBleLog.e("无响应写:" + serViceUUID.toString() + "/" + charaUUID.toString() + ">" + dataLenString + writeResult + "< " + BleUtil.byte2HexStr(data) + " >");
         return writeResult;
     }
 

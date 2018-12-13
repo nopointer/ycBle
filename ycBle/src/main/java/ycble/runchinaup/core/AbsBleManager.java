@@ -286,7 +286,7 @@ public abstract class AbsBleManager implements ConnScanListener {
     //无响应数据
     protected final boolean writeDataWithoutResp(UUID U_ser, UUID U_chara, byte[] data) throws BleUUIDNullException {
         if (absBleConnManger != null) {
-            insertBeforeWrite(BleUnitTask.createWriteWithOutResp(U_ser, U_chara, data, "无响应数据"));
+            insertBeforeWrite(BleUnitTask.createWriteWithOutResp(U_ser, U_chara, data, "无响应写数据"));
             return absBleConnManger.writeDataWithOutResponse(U_ser, U_chara, data);
         }
         return false;
@@ -672,6 +672,8 @@ public abstract class AbsBleManager implements ConnScanListener {
                             enableNotity(unitTask.getU_service(), unitTask.getU_chara());
                         } else if (unitTask.getOptionType() == BleUnitTask.TYPE_WRITE) {
                             writeData(unitTask.getU_service(), unitTask.getU_chara(), writeData);
+                        } else if (unitTask.getOptionType() == BleUnitTask.TYPE_WRITE_WITHOUT_RESP) {
+                            writeDataWithoutResp(unitTask.getU_service(), unitTask.getU_chara(), writeData);
                         }
                     } catch (BleUUIDNullException e) {
                         e.printStackTrace();
