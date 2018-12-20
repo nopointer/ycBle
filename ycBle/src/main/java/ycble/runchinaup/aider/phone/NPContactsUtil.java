@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONException;
 
@@ -50,10 +51,15 @@ public final class NPContactsUtil {
             tmpList.clear();
             Uri uri = Data.CONTENT_URI; // 联系人Uri；
             Cursor cursor = context.getContentResolver().query(uri, null, null, null, Data.RAW_CONTACT_ID);
-            if (cursor == null) return;
+            if (cursor == null) {
+                ycBleLog.e("联系人列表为空");
+                return;
+            } else {
+                ycBleLog.e("联系人列表不为空");
+            }
             while (cursor.moveToNext()) {
                 try {
-//                    debugCursor(cursor);
+                    debugCursor(cursor);
                     String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
                     if (!mimeType.equals(phoneDataMimeType)) {
                         continue;
@@ -83,7 +89,13 @@ public final class NPContactsUtil {
      * @return
      */
     public synchronized static String getContactName(String phoneNumber) {
-        phoneNumber = phoneNumber.replace("-", "").replace("+", "").replace(" ", "");
+        ycBleLog.e("来短信的号码是(带rom自定义的前缀):" + phoneNumber);
+        if (phoneNumber.startsWith("86")) {
+            phoneNumber = phoneNumber.substring(2);
+        } else if (phoneNumber.startsWith("+86")) {
+            phoneNumber = phoneNumber.substring(3);
+        }
+        phoneNumber = phoneNumber.replace("+", "").replace("-", "").replace(" ", "");
         if (npContactInfoList == null || npContactInfoList.size() < 1) return phoneNumber;
         NPContactEntity tmpContact = null;
         for (NPContactEntity contactInfo : npContactInfoList) {
@@ -132,6 +144,6 @@ public final class NPContactsUtil {
                 e.printStackTrace();
             }
         }
-        ycBleLog.e("json:" + jsonObject.toString());
+        Log.e("json:", jsonObject.toString());
     }
 }
