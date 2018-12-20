@@ -59,7 +59,7 @@ public final class NPContactsUtil {
             }
             while (cursor.moveToNext()) {
                 try {
-                    debugCursor(cursor);
+//                    debugCursor(cursor);
                     String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
                     if (!mimeType.equals(phoneDataMimeType)) {
                         continue;
