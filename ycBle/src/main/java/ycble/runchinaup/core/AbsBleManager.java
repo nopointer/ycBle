@@ -437,8 +437,16 @@ public abstract class AbsBleManager implements ConnScanListener {
         bleUnitTaskIndex++;
         if (bleUnitTaskIndex < bleTaskSize) {
             ycBleLog.e("ble===task====>" + (bleUnitTaskIndex + 1) + "/" + bleTaskSize);
+            if (bleUnitTaskIndex < 0) {
+                ycBleLog.e("bleUnitTaskIndex 异常====>" + bleUnitTaskIndex);
+                return;
+            }
             BleUnitTask unitTask = bleUnitTaskList.get(bleUnitTaskIndex);
-            if (unitTask == null) return;
+            if (unitTask == null) {
+                ycBleLog.e("unitTask 异常====>" + bleUnitTaskIndex);
+                return;
+            }
+            ;
             try {
                 switch (unitTask.getOptionType()) {
                     case BleUnitTask.TYPE_READ: {

@@ -20,7 +20,7 @@ import ycble.runchinaup.core.callback.ScanListener;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
 
-import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY;
+import static android.bluetooth.le.ScanSettings.SCAN_MODE_BALANCED;
 import static ycble.runchinaup.BleCfg.npBleTag;
 
 /**
@@ -58,7 +58,7 @@ public class BleScaner {
             }
             if (scanSettings == null) {
                 ScanSettings.Builder builder = new ScanSettings.Builder();
-                builder.setScanMode(SCAN_MODE_LOW_LATENCY);
+                builder.setScanMode(SCAN_MODE_BALANCED);
                 scanSettings = builder.build();
             }
         }
