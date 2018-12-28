@@ -86,7 +86,7 @@ final class NotificationMsgUtil {
 
     //重新绑定service
     public static void reBindService(Context context) {
-        ycBleLog.w("reBindService==>NPNotificationService");
+        ycBleLog.e("reBindService==>NPNotificationService");
         ComponentName thisComponent = new ComponentName(context, NPNotificationService.class);
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);

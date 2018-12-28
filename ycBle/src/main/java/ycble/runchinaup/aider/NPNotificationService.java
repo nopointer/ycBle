@@ -41,13 +41,13 @@ public final class NPNotificationService extends NotificationListenerService {
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
-        ycBleLog.w("通知栏服务正常，可以获取到通知信息");
+        ycBleLog.e("通知栏服务正常，可以获取到通知信息");
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ycBleLog.w("通知栏onStartCommand");
+        ycBleLog.e("通知栏onStartCommand");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForeground(1, new Notification()); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
         }
@@ -75,7 +75,7 @@ public final class NPNotificationService extends NotificationListenerService {
         String msgStr;
         try {
             msgStr = extras.getCharSequence(Notification.EXTRA_TEXT).toString();
-            ycBleLog.w("通知栏获取到消息==>" + msgStr);
+            ycBleLog.e("通知栏获取到消息==>" + msgStr);
         } catch (NullPointerException e) {
             msgStr = "";
         }
@@ -94,7 +94,7 @@ public final class NPNotificationService extends NotificationListenerService {
     public void handMsg(String pkhName, String from, String msgContent) {
         String tmpStr = pkhName + from + msgContent;
         MsgType msgType = MsgType.pck2MsgType(pkhName);
-
+        ycBleLog.e(msgType + "/" + tmpStr);
         if (TextUtils.isEmpty(lastMsgStr) || !tmpStr.equals(lastMsgStr)) {
             MsgNotifyHelper.getMsgNotifyHelper().onAppMsgReceiver(pkhName, msgType, from, msgContent);
             lastMsgStr = tmpStr;
