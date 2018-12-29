@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 
@@ -16,6 +15,8 @@ import java.util.List;
 
 import ycble.runchinaup.aider.entity.NPContactEntity;
 import ycble.runchinaup.log.ycBleLog;
+
+import static ycble.runchinaup.aider.AiderHelper.isPrintContacts;
 
 /**
  * 通讯录工具
@@ -59,7 +60,9 @@ public final class NPContactsUtil {
             }
             while (cursor.moveToNext()) {
                 try {
-//                    debugCursor(cursor);
+                    if (isPrintContacts) {
+                        debugCursor(cursor);
+                    }
                     String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
                     if (!mimeType.equals(phoneDataMimeType)) {
                         continue;
@@ -144,6 +147,6 @@ public final class NPContactsUtil {
                 e.printStackTrace();
             }
         }
-        Log.e("json:", jsonObject.toString());
+        ycBleLog.e("联系人信息json:" + jsonObject.toString());
     }
 }

@@ -26,6 +26,8 @@ public final class AiderHelper {
         return mContext;
     }
 
+    public static boolean isPrintContacts;
+
     private AiderHelper() {
     }
 
@@ -127,7 +129,12 @@ public final class AiderHelper {
         public void onChange(boolean selfChange) {
             //这里就是联系人变化的相关操作，根据自己的 逻辑来处理
             ycBleLog.e("debug=phoneObserver=onChange==>");
-            NPContactsUtil.reLoadData(mContext);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NPContactsUtil.reLoadData(mContext);
+                }
+            }).start();
         }
     };
 
