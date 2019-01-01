@@ -1,7 +1,6 @@
 apply plugin: "com.android.library"
 apply plugin: "com.github.dcendents.android-maven"
 
-
 group = "com.github.nopointer"
 
 android {
@@ -12,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 28
-        versionName "beta_0.0.28"
+        versionCode 29
+        versionName "beta_0.0.29"
     }
 
     buildTypes {
@@ -24,11 +23,26 @@ android {
     }
 
 
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
 }
+
+
+
+
+
+
 
 dependencies {
 //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
     //dfu nordic
 //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
+
+    implementation fileTree(include: '*.jar', dir: 'libs')
+    implementation(name: 'htx_ota_lib', ext: 'aar')
 }
