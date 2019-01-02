@@ -12,7 +12,6 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.util.Log;
 
 import com.example.otalib.boads.Constant;
 import com.example.otalib.boads.Utils;
@@ -22,7 +21,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppOTA {
+import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.ota.callback.OTACallback;
+
+class HTXAppOTA {
 
 
     private Thread mTransThread = null;
@@ -31,7 +33,6 @@ public class AppOTA {
 
     private boolean mIsWorcking = false;
 
-    private static final String tag = "ota";
 
     public BluetoothLeService mBLE;
 
@@ -133,7 +134,7 @@ public class AppOTA {
 
 
     private void SendFileRseponse(int response) {
-//        Log.e("peng", "response:" + response);
+//        ycBleLog.e("peng", "response:" + response);
 
         String detail;
         switch (response) {
@@ -163,7 +164,7 @@ public class AppOTA {
                 break;
         }
 
-//        LogUtils.e("detail:" + detail);
+//        ycBleLogUtils.e("detail:" + detail);
         Message msg = handler.obtainMessage();
         msg.arg1 = MSG_OTA_RESEPONSE;
         msg.obj = detail;
@@ -179,7 +180,7 @@ public class AppOTA {
                 return;
 
             Message msg2 = msg;
-            Log.e(tag, "handleMessage:MsgWhat===========> " + msg.what);
+            ycBleLog.e("handleMessage:MsgWhat===========> " + msg.what);
             if (msg2.what == Constant.MSG_WHAT_READ_PART) {
                 int addr = msg2.arg1;
                 int length = msg2.arg2;
@@ -192,7 +193,7 @@ public class AppOTA {
                         break;
                 }
 
-//                Log.e("huntersun", "hand addr:" + addr + " length:" + length);
+//                ycBleLog.e("huntersun", "hand addr:" + addr + " length:" + length);
             } else if (msg2.what == 10) {
                 if (msg2.obj != null) {
                     String str = (String) msg2.obj;
@@ -203,7 +204,7 @@ public class AppOTA {
             switch (msg2.arg1) {
                 case MSG_OTA_RESEPONSE:
                     if (msg.obj != null) {
-//                        LogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
+//                        ycBleLogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
                         String toaststr = (String) msg.obj;
                         do_work_on_boads.ResetTarget();
                         if (otaCallback != null) {
@@ -218,7 +219,7 @@ public class AppOTA {
                     break;
                 case Constant.MSG_ARG1_KBS:
                     float kbs = (Float) msg2.obj;
-                    Log.e("ota", kbs + "kB/s");
+                    ycBleLog.e(kbs + "kB/s");
                     break;
                 case MSG_DISCONNECT_BLE:
                     break;
@@ -226,7 +227,7 @@ public class AppOTA {
 
                     break;
                 case MSG1_BLE_ERROR:
-                    Log.e(tag, "Bluetooth connection failed,Please scan bluetooth agai ");
+                    ycBleLog.e("Bluetooth connection failed,Please scan bluetooth agai ");
                     mBLE.disconnect();
                     break;
                 case MSG_BURN_PATCH_SUCCESS:
@@ -242,7 +243,7 @@ public class AppOTA {
                     byte[] senddat = (byte[]) msg2.obj;
                     boolean res;
                     if (ota_tx_dat_charac == null) {
-                        Log.e(tag, " 发数据 OTA has not discover the right character!");
+                        ycBleLog.e(" 发数据 OTA has not discover the right character!");
                         return;
                     }
                     for (int i = 0; i < len / 20; i++) {
@@ -250,12 +251,12 @@ public class AppOTA {
                         System.arraycopy(senddat, pos, packet_data, 0, 20);
 
                         if (mConnected == true && mBLE != null) {
-                            Log.e("DEBUG_OTA", "ota send lenth:" + packet_data.length);
+                            ycBleLog.e("ota send lenth:" + packet_data.length);
                             res = ota_tx_dat_charac.setValue(packet_data);
                             ota_tx_dat_charac.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                             res = mBLE.writeCharacteristic(ota_tx_dat_charac);
                             if (!res) {
-                                Log.e(tag, "writeCharacteristic() failed!!!");
+                                ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
                             pos = pos + 20;
@@ -267,15 +268,15 @@ public class AppOTA {
                         byte[] packet_data = new byte[tmp];
                         System.arraycopy(senddat, pos, packet_data, 0, tmp);
                         if (mConnected == true && mBLE != null) {
-                            Log.e("peng", "send data:" + Utils.bytesToHexString(packet_data));
+                            ycBleLog.e("send data:" + Utils.bytesToHexString(packet_data));
                             res = ota_tx_dat_charac.setValue(packet_data);
                             if (!res) {
-                                Log.e(tag, "setValue() failed!!!");
+                                ycBleLog.e("setValue() failed!!!");
                             }
                             ota_tx_dat_charac.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                             res = mBLE.writeCharacteristic(ota_tx_dat_charac);
                             if (!res) {
-                                Log.e(tag, "writeCharacteristic() failed!!!");
+                                ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
                         } else {
@@ -286,27 +287,27 @@ public class AppOTA {
 
                 case MSG_OTA_COMPLETE:
                     mIsWorcking = false;
-                    Log.e(tag, "OTA has done and success!\"");
+                    ycBleLog.e("OTA has done and success!\"");
                     if (mConnected && mBLE != null) {
                         mBLE.disconnect();
                     }
                     break;
                 case Constant.MSG_ARG1_PROGRESS_BAR_MAX:
                     int len1 = msg2.arg2;
-                    Log.e(tag, "len==>1 " + len1);
+                    ycBleLog.e("len==>1 " + len1);
                     break;
                 case Constant.MSG_ARG1_PROGRESS_BAR_UPDATA:
                     int len2 = msg2.arg2;
-                    Log.e(tag, "len==>2 " + len2);
+                    ycBleLog.e("len==>2 " + len2);
                     if (otaCallback != null) {
                         otaCallback.onProgress(len2);
                     }
                     break;
                 case MSG_HANDS_UP_FAILED:
-                    Log.e(tag, "Hands up to the boads failed before OTA!");
+                    ycBleLog.e("Hands up to the boads failed before OTA!");
                     break;
                 case Constant.MSG_ARG1_OTA_ENCRPT_KEY_FAILED:
-                    Log.e(tag, "OTA exchange key please try again");
+                    ycBleLog.e("OTA exchange key please try again");
                     mBLE.disconnect();
                     break;
                 case Constant.MSG_ARG1_SEND_OTA_CMD: {
@@ -316,7 +317,7 @@ public class AppOTA {
                     byte[] sendcmd = (byte[]) msg2.obj;
                     boolean res1 = false;
                     if (ota_tx_cmd_charac == null) {
-                        Log.e(tag, "OTA has not discover the right character!");
+                        ycBleLog.e("OTA has not discover the right character!");
                         return;
                     }
                     for (int i = 0; i < len3 / 20; i++) {
@@ -326,11 +327,11 @@ public class AppOTA {
                             ota_tx_cmd_charac.setValue(packet_data);
                             res1 = mBLE.writeCharacteristic(ota_tx_cmd_charac);
                             if (!res1) {
-                                Log.e(tag, "writeCharacteristic() failed!!!");
+                                ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
                             pos1 = pos1 + 20;
-                            Log.e(tag, packet_data.toString());
+                            ycBleLog.e(packet_data.toString());
                         } else {
                             return;
                         }
@@ -341,18 +342,18 @@ public class AppOTA {
                         System.arraycopy(sendcmd, pos1, packet_data, 0, tmp1);
                         if (mConnected == true && mBLE != null) {
 
-                            Log.e("peng", "cmd data:" + Utils.bytesToHexString(packet_data));
+                            ycBleLog.e("cmd data:" + Utils.bytesToHexString(packet_data));
                             boolean b = ota_tx_cmd_charac.setValue(packet_data);
                             if (!b) {
-                                Log.e(tag, "setValue failed!");
+                                ycBleLog.e("setValue failed!");
                                 return;
                             }
                             res1 = mBLE.writeCharacteristic(ota_tx_cmd_charac);
                             if (!res1) {
-                                Log.e(tag, "writeCharacteristic() failed!!!");
+                                ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
-                            Log.e(tag, packet_data.toString());
+                            ycBleLog.e(packet_data.toString());
                         } else {
                             return;
                         }
@@ -373,22 +374,22 @@ public class AppOTA {
                 mConnected = true;
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                Log.e("peng", "disconnection");
+                ycBleLog.e("disconnection");
                 if (mIsWorcking) {
-                    Log.e("tag", "The connection is lost while OTA is working!");
+                    ycBleLog.e("The connection is lost while OTA is working!");
                     mIsWorcking = false;
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {
                 if (mBluetoothAdapter != null) {
                     mBluetoothAdapter.disable();
-                    Log.e("tag", "Bluetooth connection status is 133,reset the bluetooth now,please wait");
+                    ycBleLog.e("Bluetooth connection status is 133,reset the bluetooth now,please wait");
                     mBluetoothAdapter.enable();
                 }
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 BluetoothGattServices = mBLE.getSupportedGattServices();
 
-                Log.e(tag, "已经连接上了 扫描服务: ");
+                ycBleLog.e("已经连接上了 扫描服务: ");
                 if (BluetoothGattServices == null) return;
                 String uuid = null;
                 final Message msg = Message.obtain();
@@ -401,7 +402,7 @@ public class AppOTA {
                     // Loops through available Characteristics.
                     for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
 
-                        Log.e(tag, "gattCharacteristic: " + gattCharacteristic.getUuid());
+                        ycBleLog.e("gattCharacteristic: " + gattCharacteristic.getUuid());
 
                         if (gattCharacteristic.getUuid().toString().contains("00002")) {
                             continue;
@@ -410,7 +411,7 @@ public class AppOTA {
                         //charas.add(gattCharacteristic);
                         if (SampleGattAttributes.otas_tx_dat_uuid.equals(gattCharacteristic.getUuid().toString())) {
                             ota_tx_dat_charac = gattCharacteristic;
-                            Log.e(tag, "不为空吧？: " + ota_tx_dat_charac);
+                            ycBleLog.e("不为空吧？: " + ota_tx_dat_charac);
                         } else if (SampleGattAttributes.otas_rx_dat_uuid.equals(gattCharacteristic.getUuid().toString())) {
                             ota_rx_dat_charac = gattCharacteristic;
                             if ((ota_rx_dat_charac.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
@@ -420,12 +421,12 @@ public class AppOTA {
                                     public void run() {
                                         boolean res = mBLE.setCharacteristicNotification(gattCharacteristic, true);
                                         if (res) {
-                                            Log.e(tag, "Set Notify Success");
+                                            ycBleLog.e("Set Notify Success");
 
                                         } else {
                                             msg.arg1 = MSG1_BLE_ERROR;
                                             handler.sendMessage(msg);
-                                            Log.e(tag, "Notify failed!!");
+                                            ycBleLog.e("Notify failed!!");
                                             return;
                                         }
                                     }
@@ -441,12 +442,12 @@ public class AppOTA {
                                 boolean res = mBLE.setCharacteristicNotification(
                                         gattCharacteristic, true);
                                 if (res) {
-                                    Log.e(tag, "Set Notify Success");
+                                    ycBleLog.e("Set Notify Success");
 
                                 } else {
                                     msg.arg1 = MSG1_BLE_ERROR;
                                     handler.sendMessage(msg);
-                                    Log.e(tag, "Notify failed!!");
+                                    ycBleLog.e("Notify failed!!");
                                     return;
                                 }
                             }
@@ -463,11 +464,11 @@ public class AppOTA {
                                 boolean res = mBLE.setCharacteristicNotification(
                                         gattCharacteristic, true);
                                 if (res) {
-                                    Log.e(tag, "Set Notify Success");
+                                    ycBleLog.e("Set Notify Success");
                                 } else {
                                     msg.arg1 = MSG1_BLE_ERROR;
                                     handler.sendMessage(msg);
-                                    Log.e(tag, "Notify failed!!");
+                                    ycBleLog.e("Notify failed!!");
                                     return;
                                 }
                             }
@@ -493,7 +494,7 @@ public class AppOTA {
             // HS OTA
             else if (BluetoothLeService.OTA_RX_DAT_ACTION.equals(action)) {
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.ARRAY_BYTE_DATA);
-//                Log.e("peng", "DATA notify:" + Utils.bytesToHexString(data));
+//                ycBleLog.e("peng", "DATA notify:" + Utils.bytesToHexString(data));
 
                 if (data != null) {
                     do_work_on_boads.setBluetoothNotifyData(data, Constant.DATCHARC);
@@ -502,14 +503,14 @@ public class AppOTA {
             //OTA CMD
             else if (BluetoothLeService.OTA_RX_CMD_ACTION.equals(action)) {
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.ARRAY_BYTE_DATA);
-                Log.e("peng", "CMD notify:" + Utils.bytesToHexString(data));
+                ycBleLog.e("CMD notify:" + Utils.bytesToHexString(data));
                 if (data != null) {
                     do_work_on_boads.setBluetoothNotifyData(data, Constant.CMDCHARC);
                 }
             } //OTA isp CMD
             else if (BluetoothLeService.OTA_RX_ISP_CMD_ACTION.equals(action)) {
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.ARRAY_BYTE_DATA);
-                Log.e("peng", "ISP notify:" + Utils.bytesToHexString(data));
+                ycBleLog.e("ISP notify:" + Utils.bytesToHexString(data));
                 do_work_on_boads.EntryIspMoudle(Constant.MSG_ARG1_ENTRY_ISP);
 
                 handler.postDelayed(new Runnable() {
@@ -543,9 +544,9 @@ public class AppOTA {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBLE = ((BluetoothLeService.LocalBinder) service).getService();
-            Log.e(tag, "in onServiceConnected!!!");
+            ycBleLog.e("in onServiceConnected!!!");
             if (!mBLE.initialize()) {
-                Log.e(tag, "Unable to initialize Bluetooth");
+                ycBleLog.e("Unable to initialize Bluetooth");
             }
             mBLE.connect(mDeviceAddress);
         }

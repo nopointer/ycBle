@@ -5,6 +5,7 @@ import android.content.Context;
 import no.nordicsemi.android.dfu.DfuBaseService;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.ota.absimpl.htx.HTXOTAHelper;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
 import ycble.runchinaup.ota.callback.OTACallback;
 
@@ -33,6 +34,7 @@ public class OTAHelper {
 
     public void startOTA(Context context, String filePath, BleDevice bleDevice, FirmType firmType, OTACallback otaCallback) {
         ycBleLog.e("startOTA======>");
+        ycBleLog.e("firmType======>" + firmType );
         ycBleLog.e("filePath======>" + filePath);
         ycBleLog.e("bleDevice======>" + bleDevice);
         ycBleLog.e("firmType======>" + firmType);
@@ -42,9 +44,17 @@ public class OTAHelper {
 
     public void startOTA(Context context, String filePath, String mac, String name, FirmType firmType, OTACallback otaCallback) {
         switch (firmType) {
+            //nordic的ota 也是默认的ota
             case NORDIC:
             default:
                 DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseService);
+                break;
+            case HTX://汉天下的OTA
+                HTXOTAHelper htxotaHelper = HTXOTAHelper.getInstance();
+                htxotaHelper.setAppFilePath(filePath);
+                htxotaHelper.setDeviceMac(mac);
+                htxotaHelper.setOtaCallback(otaCallback);
+                htxotaHelper.startOTA(context);
                 break;
         }
     }

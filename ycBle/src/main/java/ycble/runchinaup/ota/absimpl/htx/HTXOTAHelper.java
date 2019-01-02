@@ -2,21 +2,23 @@ package ycble.runchinaup.ota.absimpl.htx;
 
 import android.content.Context;
 
-public class OTAHelper {
-    private static final OTAHelper ourInstance = new OTAHelper();
+import ycble.runchinaup.ota.callback.OTACallback;
 
-    public static OTAHelper getInstance() {
+public class HTXOTAHelper {
+    private static final HTXOTAHelper ourInstance = new HTXOTAHelper();
+
+    public static HTXOTAHelper getInstance() {
         return ourInstance;
     }
 
-    private OTAHelper() {
-        deviceMac = "C1:2F:F2:C3:D5:0F";
+    private HTXOTAHelper() {
+//        deviceMac = "C1:2F:F2:C3:D5:0F";
     }
 
     private String appFilePath;
     private String deviceMac;
 
-    private AppOTA appOTA = null;
+    private HTXAppOTA appOTA = null;
 
     private OTACallback otaCallback = null;
 
@@ -39,7 +41,7 @@ public class OTAHelper {
 
     public void startOTA(Context context) {
         if (appOTA == null) {
-            appOTA = new AppOTA();
+            appOTA = new HTXAppOTA();
         }
         appOTA.setOtaCallback(otaCallback);
         appOTA.setAppFileStringPath(appFilePath);

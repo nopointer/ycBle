@@ -31,6 +31,7 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
+        <service android:name=".ota.absimpl.htx.BluetoothLeService" />
         <!--<service-->
             <!--android:name=".ota.absimpl.nordic.DfuService"-->
             <!--android:exported="false"-->
