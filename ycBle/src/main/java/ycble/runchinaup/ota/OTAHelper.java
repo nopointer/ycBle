@@ -34,10 +34,9 @@ public class OTAHelper {
 
     public void startOTA(Context context, String filePath, BleDevice bleDevice, FirmType firmType, OTACallback otaCallback) {
         ycBleLog.e("startOTA======>");
-        ycBleLog.e("firmType======>" + firmType );
+        ycBleLog.e("firmType======>" + firmType);
         ycBleLog.e("filePath======>" + filePath);
         ycBleLog.e("bleDevice======>" + bleDevice);
-        ycBleLog.e("firmType======>" + firmType);
         ycBleLog.e("otaCallback======>" + otaCallback);
         startOTA(context, filePath, bleDevice.getMac(), bleDevice.getName(), firmType, otaCallback);
     }
@@ -50,6 +49,7 @@ public class OTAHelper {
                 DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseService);
                 break;
             case HTX://汉天下的OTA
+                ycBleLog.e("开始汉天下的ota======>");
                 HTXOTAHelper htxotaHelper = HTXOTAHelper.getInstance();
                 htxotaHelper.setAppFilePath(filePath);
                 htxotaHelper.setDeviceMac(mac);

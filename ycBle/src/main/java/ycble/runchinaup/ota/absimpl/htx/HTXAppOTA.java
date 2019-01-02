@@ -82,6 +82,7 @@ class HTXAppOTA {
         context.startService(i);
         boolean res = context.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        ycBleLog.e("startOTA======> startOTA");
     }
 
 
@@ -553,6 +554,7 @@ class HTXAppOTA {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            ycBleLog.e("in onServiceDisconnected!!!");
             mBLE = null;
         }
     };

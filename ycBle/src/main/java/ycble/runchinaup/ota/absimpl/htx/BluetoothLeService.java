@@ -1,7 +1,6 @@
 package ycble.runchinaup.ota.absimpl.htx;
 
 
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -24,7 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 
-@SuppressLint("NewApi")
 public class BluetoothLeService extends Service {
 
     public static Semaphore write_characer_lock = new Semaphore(1);
