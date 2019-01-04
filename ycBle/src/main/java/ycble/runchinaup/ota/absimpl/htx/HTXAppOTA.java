@@ -174,6 +174,9 @@ class HTXAppOTA {
     }
 
 
+    //文件总进度
+    private int fileTotalSize = 0;
+
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -261,6 +264,8 @@ class HTXAppOTA {
                                 return;
                             }
                             pos = pos + 20;
+                            ycBleLog.e("ota pos:" + pos + " / " + len);
+
                         } else {
                             return;
                         }
@@ -296,12 +301,14 @@ class HTXAppOTA {
                 case Constant.MSG_ARG1_PROGRESS_BAR_MAX:
                     int len1 = msg2.arg2;
                     ycBleLog.e("len==>1 " + len1);
+                    fileTotalSize = len1;
                     break;
                 case Constant.MSG_ARG1_PROGRESS_BAR_UPDATA:
-                    int len2 = msg2.arg2;
-                    ycBleLog.e("len==>2 " + len2);
+                    int currentValue = msg2.arg2;
+                    float progress = (currentValue * 100) / fileTotalSize;
+                    ycBleLog.e("len==>2 " + currentValue + "/" + fileTotalSize);
                     if (otaCallback != null) {
-                        otaCallback.onProgress(len2);
+                        otaCallback.onProgress((int) progress);
                     }
                     break;
                 case MSG_HANDS_UP_FAILED:

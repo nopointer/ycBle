@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 32
-        versionName "beta_0.0.32"
+        versionCode 33
+        versionName "beta_0.0.33"
     }
 
     buildTypes {
@@ -21,7 +21,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 
     repositories {
         flatDir {
@@ -32,17 +31,12 @@ android {
 }
 
 
-
-
-
-
-
 dependencies {
 //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
     //dfu nordic
 //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
 
-    implementation fileTree(include: '*.jar', dir: 'libs')
-    implementation(name: 'htx_ota_lib', ext: 'aar')
+    api fileTree(include: '*.jar', dir: 'libs')
+    api(name: 'htx_ota_lib', ext: 'aar')
 }
