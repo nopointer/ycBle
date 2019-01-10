@@ -13,5 +13,4 @@ public class BleCfg implements Serializable {
     //配置是否
     public static final String npBleTag = "nopointer/npBle->debug:";
 
-
 }

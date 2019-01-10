@@ -64,6 +64,8 @@ public class ycBleLog {
     public static boolean allowV = true;
     public static boolean allowW = true;
     public static boolean allowWtf = true;
+    //是否允许把日志文件写在本地文件里面
+    public static boolean allowWriteLogToLocalFile = true;
 
     private static SimpleDateFormat smp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -74,8 +76,10 @@ public class ycBleLog {
         }
 
         if (TextUtils.isEmpty(logMac)) return;
-        String dateTime = smp.format(new Date());
-        writeFile(dateTime + "  " + content);
+        if (allowWriteLogToLocalFile) {
+            String dateTime = smp.format(new Date());
+            writeFile(dateTime + "  " + content);
+        }
     }
 
     public static void w(String content) {
