@@ -50,4 +50,11 @@ public class HTXOTAHelper {
     }
 
 
+    public void free() {
+        if (appOTA != null) {
+            appOTA.free();
+        }
+
+    }
+
 }

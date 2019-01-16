@@ -59,4 +59,11 @@ public class OTAHelper {
         }
     }
 
+    /**
+     * 释放资源
+     */
+    public void free() {
+        HTXOTAHelper.getInstance().free();
+    }
+
 }

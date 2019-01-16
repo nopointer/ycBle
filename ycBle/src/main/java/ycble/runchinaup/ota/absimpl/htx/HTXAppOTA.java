@@ -60,6 +60,8 @@ class HTXAppOTA {
     private String mDeviceAddress;
     private String appFileStringPath;
 
+    private Context context = null;
+
     public void setmDeviceAddress(String mDeviceAddress) {
         this.mDeviceAddress = mDeviceAddress;
     }
@@ -77,12 +79,26 @@ class HTXAppOTA {
 
     protected void startOTA(Context context) {
         //start broadcast-service
+        this.context = context;
         do_work_on_boads = new WorkOnBoads(context, handler);
         Intent i = new Intent(context, BluetoothLeService.class);
         context.startService(i);
         boolean res = context.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         ycBleLog.e("startOTA======> startOTA");
+    }
+
+    protected void free() {
+        try {
+            if (context != null) {
+                context.unregisterReceiver(mGattUpdateReceiver);
+            }
+            if (mServiceConnection != null) {
+                context.unbindService(mServiceConnection);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
