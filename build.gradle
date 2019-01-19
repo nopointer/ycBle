@@ -35,7 +35,7 @@ ext {
             // SDK And Tools
             minSdkVersion        : 19,
             targetSdkVersion     : 20,
-            compileSdkVersion    : 26,
+            compileSdkVersion    : 27,
             buildToolsVersion    : "27.0.0",
             //Dependencies
             supportLibraryVersion: "27.0.0"

@@ -1,7 +1,9 @@
 apply plugin: "com.android.application"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion var.compileSdkVersion
+    buildToolsVersion var.buildToolsVersion
+
     defaultConfig {
         applicationId "lib.ycble"
         minSdkVersion var.minSdkVersion
