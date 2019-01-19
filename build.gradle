@@ -6,9 +6,6 @@ buildscript {
         google()
         maven { url 'https://jitpack.io' }
         jcenter()
-        flatDir {
-            dirs 'libs'
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -24,9 +21,7 @@ allprojects {
         google()
         maven { url 'https://jitpack.io' }
         jcenter()
-        flatDir {
-            dirs 'libs'
-        }
+//        maven { url "https://raw.githubusercontent.com/nopointer/ycBle/master" }
     }
 }
 
@@ -38,7 +33,7 @@ task clean(type: Delete) {
 ext {
     var = [
             // SDK And Tools
-            minSdkVersion        : 18,
+            minSdkVersion        : 19,
             targetSdkVersion     : 20,
             compileSdkVersion    : 26,
             buildToolsVersion    : "27.0.0",
