@@ -1,6 +1,5 @@
 package lib.ycble.bleModule;
 
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 
 import java.text.SimpleDateFormat;
@@ -10,8 +9,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import lib.ycble.MainApplication;
-import lib.ycble.R;
 import lib.ycble.bleModule.imageTransport.DevImageUtils;
 import lib.ycble.bleModule.imageTransport.ReceiveImageDataCallback;
 import lib.ycble.bleModule.utils.DevDataUtils;
@@ -710,7 +707,7 @@ public class BleManager extends AbsBleManager implements BleCfg {
 
         final long startTime = System.currentTimeMillis();
 
-        devImageUtils.initImageCfg(BitmapFactory.decodeResource(MainApplication.getMainApplication().getResources(), R.drawable.demo_666));
+//        devImageUtils.initImageCfg(BitmapFactory.decodeResource(MainApplication.getMainApplication().getResources(), R.drawable.demo_666));
 
 
         devImageUtils.setReceiveImageDataCallback(new ReceiveImageDataCallback() {
