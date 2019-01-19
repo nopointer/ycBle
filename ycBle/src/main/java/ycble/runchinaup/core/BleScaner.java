@@ -136,6 +136,9 @@ public class BleScaner {
                     }
                 };
             }
+            if (adapter == null) {
+                adapter = BluetoothAdapter.getDefaultAdapter();
+            }
             if (bluetoothLeScanner == null) {
                 bluetoothLeScanner = adapter.getBluetoothLeScanner();
             }
