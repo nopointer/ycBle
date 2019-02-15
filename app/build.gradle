@@ -38,6 +38,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':ycBle')
     //ycBle Module 集成的蓝牙库 如果需要ota的话 就要引用dfu
-    //    implementation 'com.github.nopointer:ycBle:beta_0.0.32'
+//        implementation 'com.github.nopointer:ycBle:beta_0.0.41'
     api(name: 'htx_ota_lib', ext: 'aar')
 }
