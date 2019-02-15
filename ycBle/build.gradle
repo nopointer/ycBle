@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 43
-        versionName "beta_0.0.43"
+        versionCode 44
+        versionName "beta_0.0.44"
     }
 
     buildTypes {
@@ -36,7 +36,10 @@ android {
 
 
 dependencies {
-    //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
+
+    testImplementation "junit:junit:4.12"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+
     //dfu nordic
     //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
