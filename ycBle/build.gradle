@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 40
-        versionName "beta_0.0.40"
+        versionCode 41
+        versionName "beta_0.0.41"
     }
 
     buildTypes {
@@ -28,15 +28,18 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 
 dependencies {
-//    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
+    //    implementation "com.android.support:appcompat-v7:${var.supportLibraryVersion}"
     //dfu nordic
-//    implementation 'no.nordicsemi.android:dfu:1.6.1'
+    //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
-
     api fileTree(include: '*.jar', dir: 'libs')
     api(name: 'htx_ota_lib', ext: 'aar')
 }
