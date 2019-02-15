@@ -48,22 +48,25 @@ public class NPSmsReciver extends BroadcastReceiver {
         ycBleLog.e("debug sms" + "短信来了===>");
         Bundle bundle = intent.getExtras();
         SmsMessage msg = null;
+        String number = null;
+        StringBuilder messageContentBuilder = new StringBuilder();
         if (null != bundle) {
             Object[] smsObj = (Object[]) bundle.get("pdus");
             if (null != smsObj) {
                 for (Object object : smsObj) {
                     msg = SmsMessage.createFromPdu((byte[]) object);
                     if (null != msg) {
-                        String number = msg.getOriginatingAddress();
+                        number = msg.getOriginatingAddress();
                         String messageContent = msg.getDisplayMessageBody();
                         if (null == number || null == messageContent || TextUtils.isEmpty(number) || TextUtils.isEmpty(messageContent)) {
                             return;
                         }
-                        if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContent)) {
-                            strLastContent = messageContent;
-                            MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), new String(messageContent));
-                        }
+                        messageContentBuilder.append(messageContent);
                     }
+                }
+                if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContentBuilder.toString())) {
+                    MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), messageContentBuilder.toString());
+                    strLastContent = messageContentBuilder.toString();
                 }
             }
         }
