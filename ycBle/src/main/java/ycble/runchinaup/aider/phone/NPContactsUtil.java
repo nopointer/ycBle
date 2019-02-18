@@ -93,12 +93,14 @@ public final class NPContactsUtil {
      */
     public synchronized static String getContactName(String phoneNumber) {
         ycBleLog.e("来短信的号码是(带rom自定义的前缀):" + phoneNumber);
+        //这里要先去除带了特殊格式的号码，把他变成一个连续的数字 即常规的手机号码
         if (phoneNumber.startsWith("86")) {
             phoneNumber = phoneNumber.substring(2);
         } else if (phoneNumber.startsWith("+86")) {
             phoneNumber = phoneNumber.substring(3);
         }
         phoneNumber = phoneNumber.replace("+", "").replace("-", "").replace(" ", "");
+
         if (npContactInfoList == null || npContactInfoList.size() < 1) return phoneNumber;
         NPContactEntity tmpContact = null;
         for (NPContactEntity contactInfo : npContactInfoList) {
@@ -109,12 +111,19 @@ public final class NPContactsUtil {
             if (TextUtils.isEmpty(phone)) {
                 phone = contactInfo.getData1();
             }
+            //拿到通讯录的手机号码 也去除一下特殊的符号
+            if (phone.startsWith("86")) {
+                phone = phone.substring(2);
+            } else if (phone.startsWith("+86")) {
+                phone = phone.substring(3);
+            }
             phone = phone.replace(" ", "").replace("+", "").replace("-", "");
-            if (phone.indexOf(phoneNumber) != -1) {
+            if (phone.equalsIgnoreCase(phoneNumber)) {
                 tmpContact = contactInfo;
                 break;
             }
         }
+
         if (tmpContact != null) {
             if (tmpContact.getDisplay_name().matches(NUMBER_RULE)) {
                 if (tmpContact.getDisplay_name_alt().matches(NUMBER_RULE)) {
