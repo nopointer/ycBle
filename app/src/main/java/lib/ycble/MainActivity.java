@@ -24,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
     //    String appFileStringPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/htx/A7.bin";
     String appFileStringPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/htx/A7_2.bin";
 
-    String mDeviceAddress = "D2:7A:23:98:2F:09";
+    //    String mDeviceAddress = "D2:7A:23:98:2F:09";
+    String mDeviceAddress = "C0:08:22:C7:91:4D";
+//    String mDeviceAddress = "E7:E6:A2:82:3A:5F";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,12 @@ public class MainActivity extends AppCompatActivity {
         OTAHelper.getInstance().startOTA(this, appFileStringPath, mDeviceAddress, "", FirmType.HTX, new OTACallback() {
             @Override
             public void onFailure(String message) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "ota失败！！！！！", 0).show();
+                    }
+                });
             }
 
             @Override
