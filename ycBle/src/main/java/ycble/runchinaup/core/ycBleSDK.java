@@ -12,8 +12,16 @@ public class ycBleSDK {
      * @param context
      */
     public static void initSDK(Context context) {
-        AbsBleManager.initSDK(context);
-        AiderHelper.init(context);
+        initSDK(context, true);
     }
+
+
+    public static void initSDK(Context context, boolean enableAider) {
+        AbsBleManager.initSDK(context);
+        if (enableAider) {
+            AiderHelper.init(context);
+        }
+    }
+
 
 }

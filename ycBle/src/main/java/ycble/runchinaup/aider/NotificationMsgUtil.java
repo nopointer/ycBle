@@ -35,6 +35,8 @@ final class NotificationMsgUtil {
      */
     public static boolean isEnabled(Context context) {
 
+//        return NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.getPackageName());
+
         Set<String> packageNames = NotificationManagerCompat.getEnabledListenerPackages(context);
         debug(packageNames);
         if (packageNames.contains(context.getPackageName())) {

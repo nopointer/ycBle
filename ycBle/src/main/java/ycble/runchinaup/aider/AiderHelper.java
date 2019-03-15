@@ -31,6 +31,7 @@ public final class AiderHelper {
     private AiderHelper() {
     }
 
+
     private static AiderHelper aiderHelper = new AiderHelper();
 
     public static void init(final Context context) {

@@ -32,7 +32,7 @@ public final class AbsBleConnManger {
 
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     //蓝牙状态接收器
-    protected BleStateReceiver bleStateReceiver = BleStateReceiver.getStateReceiver();
+    protected BleStateReceiver bleStateReceiver = BleStateReceiver.getInstance();
 
 
     private Context context;
@@ -220,11 +220,11 @@ public final class AbsBleConnManger {
                 if (hasConn) {
                     //如果是断开之前有过连接，那么一定会走广播的
                     ycBleLog.e("如果是断开之前有过连接，那么一定会走广播的");
-                    BleStateReceiver.getStateReceiver().setHasCover(false);
+                    BleStateReceiver.getInstance().setHasCover(false);
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (!BleStateReceiver.getStateReceiver().isHasCover()) {
+                            if (!BleStateReceiver.getInstance().isHasCover()) {
                                 ycBleLog.e("没有走广播，只能强行走回调");
                                 if (absBleConnCallback != null) {
                                     absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);

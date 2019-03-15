@@ -401,6 +401,9 @@ class HTXAppOTA {
                 ycBleLog.e("disconnection");
                 if (mIsWorcking) {
                     ycBleLog.e("The connection is lost while OTA is working!");
+                    if (otaCallback != null) {
+                        otaCallback.onFailure("The connection is lost while OTA is working!");
+                    }
                     mIsWorcking = false;
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {

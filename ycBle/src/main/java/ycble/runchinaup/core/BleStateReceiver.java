@@ -38,13 +38,13 @@ public class BleStateReceiver extends BroadcastReceiver {
         this.listenerMac = listenerMac;
     }
 
-    private static BleStateReceiver stateReceiver = new BleStateReceiver();
+    private static BleStateReceiver instance = new BleStateReceiver();
 
     private BleStateReceiver() {
     }
 
-    public static BleStateReceiver getStateReceiver() {
-        return stateReceiver;
+    public static BleStateReceiver getInstance() {
+        return instance;
     }
 
     /**
@@ -94,7 +94,6 @@ public class BleStateReceiver extends BroadcastReceiver {
         String action = intent.getAction();
 
         ycBleLog.e("BleStateReceiver 广播的action:===>" + action);
-
 
         if (action.equals(ACTION_STATE_CHANGED)) {
             int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);

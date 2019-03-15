@@ -52,7 +52,11 @@ public abstract class AbsBleManager implements ConnScanListener {
         absBleConnManger.setAbsBleConnAndStateCallback(absBleConnCallback, bleStateListener);
     }
 
-    //初始化
+    /**
+     * 此处初始化 需要指定特定的特征uuid ，用来判断是否是真的加载出了所有的特征,防止缓存机制
+     *
+     * @param mustUUIDs
+     */
     protected void init(UUID... mustUUIDs) {
         absBleConnManger = new AbsBleConnManger(mContext);
         if (mustUUIDs != null) {
@@ -175,7 +179,7 @@ public abstract class AbsBleManager implements ConnScanListener {
 
         connMac = mac;
         ycBleLog.reCreateLogFile(mac);
-        BleStateReceiver.getStateReceiver().setListenerMac(connMac);
+        BleStateReceiver.getInstance().setListenerMac(connMac);
         BluetoothDevice bluetoothDevice = AbsBleConnManger.isInConnList(mac, mContext);
         ycBleLog.e("debug===先判断 当前蓝牙设备是不是在其他的app中连接了");
         if (bluetoothDevice != null) {
@@ -603,7 +607,6 @@ public abstract class AbsBleManager implements ConnScanListener {
 
             if (isOTAMode()) {
                 ycBleLog.e("当前是OTA状态,打印一下状态就好了" + systemBluetoothState + "-" + bluetoothDevice.getAddress());
-
             }
 
             if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateOffBle) {
