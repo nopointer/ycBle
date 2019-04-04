@@ -36,6 +36,8 @@ public class NPSmsReciver extends BroadcastReceiver {
 
 
     private static String strLastContent = null;
+    //短信没有内容的时候，应该就是没有权限了，这里提示没有相关的权限
+    public static String messageWithNoPermissionText = "请授予app读取短信权限,否则无法显示短信内容";
 
     /**
      * 操蛋的方法 每个地方最好都判断一次吧 金立的烂手机就会空指针异常
@@ -64,6 +66,10 @@ public class NPSmsReciver extends BroadcastReceiver {
                         messageContentBuilder.append(messageContent);
                     }
                 }
+                if (messageContentBuilder == null) {
+                    messageContentBuilder.append(messageWithNoPermissionText);
+                }
+
                 if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContentBuilder.toString())) {
                     MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), messageContentBuilder.toString());
                     strLastContent = messageContentBuilder.toString();
@@ -80,4 +86,8 @@ public class NPSmsReciver extends BroadcastReceiver {
         return intentFilter;
     }
 
+
+    public static void setMessageWithNoPermissionText(String messageWithNoPermissionText) {
+        NPSmsReciver.messageWithNoPermissionText = messageWithNoPermissionText;
+    }
 }
