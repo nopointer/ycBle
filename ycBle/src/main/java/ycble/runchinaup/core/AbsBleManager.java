@@ -679,12 +679,23 @@ public abstract class AbsBleManager implements ConnScanListener {
                 public void run() {
                     ycBleLog.e("debug====" + BleUtil.byte2HexStr(writeData) + "指令失败，重新下发");
                     try {
+                        boolean result = true;
                         if (unitTask.getOptionType() == BleUnitTask.TYPE_ENABLE_NOTIFY) {
-                            enableNotity(unitTask.getU_service(), unitTask.getU_chara());
+                            result = enableNotity(unitTask.getU_service(), unitTask.getU_chara());
                         } else if (unitTask.getOptionType() == BleUnitTask.TYPE_WRITE) {
-                            writeData(unitTask.getU_service(), unitTask.getU_chara(), writeData);
+                            result = writeData(unitTask.getU_service(), unitTask.getU_chara(), writeData);
                         } else if (unitTask.getOptionType() == BleUnitTask.TYPE_WRITE_WITHOUT_RESP) {
-                            writeDataWithoutResp(unitTask.getU_service(), unitTask.getU_chara(), writeData);
+                            result = writeDataWithoutResp(unitTask.getU_service(), unitTask.getU_chara(), writeData);
+                        }
+                        if (!result) {
+                            clearTimeOutHandler(true);
+                            onResponseTimeOut(writeData);
+                            if (!isTaskFinish) {
+                                bleTaskSize = bleUnitTaskList.size();
+                                if (bleUnitTaskIndex < bleTaskSize) {
+                                    toNextTask();
+                                }
+                            }
                         }
                     } catch (BleUUIDNullException e) {
                         e.printStackTrace();
