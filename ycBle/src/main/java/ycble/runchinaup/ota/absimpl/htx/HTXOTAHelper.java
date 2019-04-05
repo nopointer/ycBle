@@ -40,9 +40,7 @@ public class HTXOTAHelper {
 
 
     public void startOTA(Context context) {
-        if (appOTA == null) {
-            appOTA = new HTXAppOTA();
-        }
+        appOTA = new HTXAppOTA();
         appOTA.setOtaCallback(otaCallback);
         appOTA.setAppFileStringPath(appFilePath);
         appOTA.setmDeviceAddress(deviceMac);
