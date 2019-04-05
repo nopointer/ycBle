@@ -16,6 +16,7 @@ import android.os.Message;
 import com.example.otalib.boads.Constant;
 import com.example.otalib.boads.Utils;
 import com.example.otalib.boads.WorkOnBoads;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ class HTXAppOTA {
     private WorkOnBoads do_work_on_boads;
 
     private boolean mIsWorcking = false;
+
+    //是否是成功了
+    private boolean isSuccess = false;
 
 
     public BluetoothLeService mBLE;
@@ -104,6 +108,7 @@ class HTXAppOTA {
 
     private void loadData() {
         mIsWorcking = true;
+        isSuccess = false;
         mTransThread = new Thread(new Runnable() {
 
             @Override
@@ -227,6 +232,7 @@ class HTXAppOTA {
 //                        ycBleLogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
                         String toaststr = (String) msg.obj;
                         do_work_on_boads.ResetTarget();
+                        isSuccess = true;
                         if (otaCallback != null) {
                             otaCallback.onSuccess();
                         }
@@ -355,7 +361,7 @@ class HTXAppOTA {
                                 return;
                             }
                             pos1 = pos1 + 20;
-                            ycBleLog.e(packet_data.toString());
+                            ycBleLog.e(new Gson().toJson(packet_data));
                         } else {
                             return;
                         }
@@ -398,13 +404,13 @@ class HTXAppOTA {
                 mConnected = true;
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                ycBleLog.e("disconnection");
+                ycBleLog.e("disconnection" + "/isSuccess:" + isSuccess);
                 if (mIsWorcking) {
                     ycBleLog.e("The connection is lost while OTA is working!");
-                    if (otaCallback != null) {
-                        otaCallback.onFailure("The connection is lost while OTA is working!");
-                    }
                     mIsWorcking = false;
+                }
+                if (otaCallback != null && !isSuccess) {
+                    otaCallback.onFailure("The connection is lost while OTA is working!");
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {
                 if (mBluetoothAdapter != null) {
