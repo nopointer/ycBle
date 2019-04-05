@@ -24,6 +24,7 @@ import java.util.List;
 
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.ota.callback.OTACallback;
+import ycble.runchinaup.util.BleUtil;
 
 class HTXAppOTA {
 
@@ -226,16 +227,13 @@ class HTXAppOTA {
             }
 
 
+            ycBleLog.e("msg2.arg1========>" + msg2.arg1);
             switch (msg2.arg1) {
                 case MSG_OTA_RESEPONSE:
                     if (msg.obj != null) {
 //                        ycBleLogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
                         String toaststr = (String) msg.obj;
                         do_work_on_boads.ResetTarget();
-                        isSuccess = true;
-                        if (otaCallback != null) {
-                            otaCallback.onSuccess();
-                        }
                     }
                     break;
                 case MSG_BURN_APP_SUCCESS:
@@ -315,6 +313,7 @@ class HTXAppOTA {
 
                 case MSG_OTA_COMPLETE:
                     mIsWorcking = false;
+                    isSuccess = true;
                     ycBleLog.e("OTA has done and success!\"");
                     if (mConnected && mBLE != null) {
                         mBLE.disconnect();
@@ -383,6 +382,9 @@ class HTXAppOTA {
                                 ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
+                            if (BleUtil.byte2HexStr(packet_data).equals("00000000")){
+                                isSuccess =true;
+                            }
                             ycBleLog.e(packet_data.toString());
                         } else {
                             return;
@@ -409,14 +411,25 @@ class HTXAppOTA {
                     ycBleLog.e("The connection is lost while OTA is working!");
                     mIsWorcking = false;
                 }
-                if (otaCallback != null && !isSuccess) {
-                    otaCallback.onFailure("The connection is lost while OTA is working!");
+                if (otaCallback != null) {
+                    if (isSuccess) {
+                        otaCallback.onSuccess();
+                    } else {
+                        otaCallback.onFailure("The connection is lost while OTA is working!");
+                    }
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {
                 if (mBluetoothAdapter != null) {
                     mBluetoothAdapter.disable();
                     ycBleLog.e("Bluetooth connection status is 133,reset the bluetooth now,please wait");
                     mBluetoothAdapter.enable();
+                }
+                if (otaCallback != null) {
+                    if (isSuccess) {
+                        otaCallback.onSuccess();
+                    } else {
+                        otaCallback.onFailure("The connection is lost while OTA is working!");
+                    }
                 }
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
