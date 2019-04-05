@@ -92,7 +92,7 @@ public final class NPContactsUtil {
      * @return
      */
     public synchronized static String getContactName(String phoneNumber) {
-        ycBleLog.e("来短信的号码是(带rom自定义的前缀):" + phoneNumber);
+        ycBleLog.e("联系人的号码是(带rom自定义的前缀):" + phoneNumber);
         //这里要先去除带了特殊格式的号码，把他变成一个连续的数字 即常规的手机号码
         if (phoneNumber.startsWith("86")) {
             phoneNumber = phoneNumber.substring(2);

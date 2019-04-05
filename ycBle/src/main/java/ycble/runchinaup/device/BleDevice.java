@@ -87,7 +87,6 @@ public class BleDevice implements Serializable {
     public synchronized static BleDevice parserFromScanData(BluetoothDevice device, byte[] scanData, int rssi) {
         BleDevice result = new BleDevice(device.getName(), device.getAddress(), scanData);
         result.setRssi(rssi);
-        ycBleLog.e(result.toString());
         return result;
     }
 

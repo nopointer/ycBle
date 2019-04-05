@@ -37,6 +37,8 @@ public class BleScaner {
     }
 
 
+    protected static boolean isShowScanLog = true;
+
     //线程池
     private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(10);
 
@@ -110,8 +112,10 @@ public class BleScaner {
                         cachedThreadPool.execute(new Runnable() {
                             @Override
                             public void run() {
-                                ycBleLog.w("====onScanResult====>" + result.toString() + (bleDeviceFilter == null));
                                 BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
+                                if (isShowScanLog) {
+                                    ycBleLog.e("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
+                                }
                                 if (isScanForNormal) {
                                     if (bleDeviceFilter != null) {
                                         if (bleDeviceFilter.filter(bleDevice)) {
