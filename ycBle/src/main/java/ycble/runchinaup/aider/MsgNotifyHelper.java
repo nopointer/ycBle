@@ -21,7 +21,7 @@ public final class MsgNotifyHelper {
     //设置消息回调
     private MsgCallback msgCallback;
 
-    public void setMsgCallabck(MsgCallback msgCallback) {
+    public void setMsgCallback(MsgCallback msgCallback) {
         this.msgCallback = msgCallback;
     }
 

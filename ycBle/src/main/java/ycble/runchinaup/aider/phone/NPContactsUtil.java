@@ -16,7 +16,6 @@ import java.util.List;
 import ycble.runchinaup.aider.entity.NPContactEntity;
 import ycble.runchinaup.log.ycBleLog;
 
-import static ycble.runchinaup.aider.AiderHelper.isPrintContacts;
 
 /**
  * 通讯录工具
@@ -47,7 +46,7 @@ public final class NPContactsUtil {
      * @param context
      * @throws JSONException
      */
-    public static synchronized void reLoadData(Context context) {
+    static synchronized void reLoadData(Context context) {
         try {
             tmpList.clear();
             Uri uri = Data.CONTENT_URI; // 联系人Uri；
@@ -60,9 +59,6 @@ public final class NPContactsUtil {
             }
             while (cursor.moveToNext()) {
                 try {
-                    if (isPrintContacts) {
-                        debugCursor(cursor);
-                    }
                     String mimeType = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
                     if (!mimeType.equals(phoneDataMimeType)) {
                         continue;
@@ -91,7 +87,8 @@ public final class NPContactsUtil {
      * @param phoneNumber
      * @return
      */
-    public synchronized static String getContactName(String phoneNumber) {
+    @Deprecated
+    private synchronized static String getContactName(String phoneNumber) {
         ycBleLog.e("联系人的号码是(带rom自定义的前缀):" + phoneNumber);
         //这里要先去除带了特殊格式的号码，把他变成一个连续的数字 即常规的手机号码
         if (phoneNumber.startsWith("86")) {
@@ -158,4 +155,76 @@ public final class NPContactsUtil {
         }
         ycBleLog.e("联系人信息json:" + jsonObject.toString());
     }
+
+
+    /**
+     * 查询联系人
+     *
+     * @param number 手机号码 先把这个手机号码过滤一下，变成普通的手机号码，然后再变成不同厂商喜欢的号码格式
+     */
+    public static String queryContact(Context context, String number) {
+
+        number = number.replace(" ", "").replace("-", "");
+        if (number.startsWith("+86")) {
+            number = number.substring(3);
+        }
+        if (number.startsWith("86")) {
+            number = number.substring(2);
+        }
+
+        String result = new String(number);
+        ycBleLog.e("处理过后的号码格式是:" + result);
+
+        String numberFormat0 = number;
+        String numberFormat1 = "86" + number;
+        String numberFormat2 = "+86" + number;
+        String numberFormat3 = null;
+        if (number.length() == 11) {
+            numberFormat3 = number.substring(0, 3) + " " + number.substring(3, 7) + " " + number.substring(7);
+        }
+
+        Uri uri = Data.CONTENT_URI; // 联系人Uri；
+
+        String selectionSql = new StringBuilder()
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=?")
+                .toString();
+
+        String[] selectionArgs = new String[]{
+                numberFormat0, numberFormat1, numberFormat2, numberFormat3,
+                numberFormat0, numberFormat1, numberFormat2, numberFormat3};
+
+//        selectionSql = null;
+//        selectionArgs = null;
+
+
+        Cursor cursor = context.getContentResolver().query(uri,
+                new String[]{Data.DISPLAY_NAME, Data.DISPLAY_NAME_ALTERNATIVE, Data.DATA1, Data.DATA4},
+                selectionSql, selectionArgs, Data.RAW_CONTACT_ID);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String display_name_alt = cursor.getString(cursor.getColumnIndex("display_name_alt"));
+                String display_name = cursor.getString(cursor.getColumnIndex("display_name"));
+                if (!TextUtils.isEmpty(display_name)) {
+                    result = display_name;
+                } else {
+                    if (!TextUtils.isEmpty(display_name_alt)) {
+                        result = display_name_alt;
+                    }
+                }
+                break;
+            }
+            cursor.close();
+        }
+        ycBleLog.e("联系人姓名查询结果:" + result);
+        return result;
+    }
+
+
 }

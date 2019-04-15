@@ -2,7 +2,7 @@ package ycble.runchinaup.core;
 
 import android.content.Context;
 
-import ycble.runchinaup.aider.AiderHelper;
+import ycble.runchinaup.aider.PushAiderHelper;
 
 public class ycBleSDK {
 
@@ -16,10 +16,10 @@ public class ycBleSDK {
     }
 
 
-    public static void initSDK(Context context, boolean enableAider) {
+    public static void initSDK(Context context, boolean enablePushAider) {
         AbsBleManager.initSDK(context);
-        if (enableAider) {
-            AiderHelper.init(context);
+        if (enablePushAider) {
+            PushAiderHelper.getAiderHelper().start(context);
         }
     }
 

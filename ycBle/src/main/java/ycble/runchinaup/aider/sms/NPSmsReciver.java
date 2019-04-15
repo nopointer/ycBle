@@ -71,7 +71,7 @@ public class NPSmsReciver extends BroadcastReceiver {
                 }
 
                 if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContentBuilder.toString())) {
-                    MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.getContactName(number), messageContentBuilder.toString());
+                    MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.queryContact(context, number), messageContentBuilder.toString());
                     strLastContent = messageContentBuilder.toString();
                 }
             }

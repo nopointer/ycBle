@@ -66,7 +66,6 @@ public final class NPNotificationService extends NotificationListenerService {
         if (extras == null) return;
         String notificationTitle = extras.getString(Notification.EXTRA_TITLE);
         if (TextUtils.isEmpty(notificationTitle)) return;
-
         //应用包名
         String pckName = sbn.getPackageName();
         //消息发送方
@@ -75,11 +74,13 @@ public final class NPNotificationService extends NotificationListenerService {
         String msgStr;
         try {
             msgStr = extras.getCharSequence(Notification.EXTRA_TEXT).toString();
-            ycBleLog.e("通知栏获取到消息==>" + msgStr);
         } catch (NullPointerException e) {
             msgStr = "";
         }
         if (TextUtils.isEmpty(from) || TextUtils.isEmpty(msgStr)) return;
+
+        ycBleLog.e("通知栏获取到消息==>{" + msgStr + "}===>pckName:" + pckName);
+
         handMsg(pckName, from, msgStr);
     }
 
@@ -92,7 +93,17 @@ public final class NPNotificationService extends NotificationListenerService {
 
     //处理消息，判断消息类型和来源
     public void handMsg(String pkhName, String from, String msgContent) {
-        String tmpStr = pkhName + from + msgContent;
+//        String deviceBrand = android.os.Build.BRAND.toUpperCase();
+//        ycBleLog.e("android.os.Build.BRAND:" + deviceBrand);
+//        if (pkhName.contains("com.android.incallui")) {
+//            switch (android.os.Build.BRAND) {
+//                case "HONOR":
+//                    ycBleLog.e("荣耀手机");
+//                    break;
+//            }
+//        }
+
+        String tmpStr = pkhName + "/from:" + from + "/msgContent:" + msgContent;
         MsgType msgType = MsgType.pck2MsgType(pkhName);
         ycBleLog.e(msgType + "/" + tmpStr);
         if (TextUtils.isEmpty(lastMsgStr) || !tmpStr.equals(lastMsgStr)) {

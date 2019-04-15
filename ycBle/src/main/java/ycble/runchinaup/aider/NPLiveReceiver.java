@@ -24,7 +24,7 @@ class NPLiveReceiver extends BroadcastReceiver {
      */
     public static IntentFilter createIntentFilter() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+//        intentFilter.addAction(Intent.ACTION_TIME_TICK);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         return intentFilter;
