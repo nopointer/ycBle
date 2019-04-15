@@ -1,31 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ycble.runchinaup">
 
-    <!--蓝牙权限-->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <!--蓝牙管理权限-->
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
-
-    <!--读取短信权限-->
-    <uses-permission android:name="android.permission.READ_SMS" />
-    <!--接收短信权限-->
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <!--接收彩信权限-->
-    <uses-permission android:name="android.permission.RECEIVE_MMS" />
-    <!--接收wap网络推送权限-->
-    <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
-
-
-    <!--读取通话记录权限-->
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <!--读取电话状态权限-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!--读取通讯录权限-->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <!--获取账户权限-->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
     <application>
 
         <service
@@ -49,18 +24,5 @@
             android:name=".ota.absimpl.htx.BluetoothLeService"
             android:enabled="true"
             android:exported="true" />
-        <!--<service-->
-        <!--android:name=".ota.absimpl.nordic.DfuService"-->
-        <!--android:exported="false"-->
-        <!--android:enabled="true"-->
-        <!--android:label="DfuService">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="no.nordicsemi.android.action.DFU_UPLOAD" />-->
-
-        <!--<category android:name="android.intent.category.DEFAULT" />-->
-        <!--</intent-filter>-->
-        <!--</service>-->
-
-        <!--<activity android:name=".ota.absimpl.nordic.NotificationActivity" />-->
     </application>
 </manifest>

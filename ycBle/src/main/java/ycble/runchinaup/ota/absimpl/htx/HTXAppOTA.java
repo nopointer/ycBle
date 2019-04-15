@@ -101,6 +101,9 @@ class HTXAppOTA {
             if (mServiceConnection != null) {
                 context.unbindService(mServiceConnection);
             }
+            if (handler != null) {
+                handler.removeCallbacksAndMessages(null);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -382,8 +385,8 @@ class HTXAppOTA {
                                 ycBleLog.e("writeCharacteristic() failed!!!");
                                 return;
                             }
-                            if (BleUtil.byte2HexStr(packet_data).equals("00000000")){
-                                isSuccess =true;
+                            if (BleUtil.byte2HexStr(packet_data).equals("00000000")) {
+                                isSuccess = true;
                             }
                             ycBleLog.e(packet_data.toString());
                         } else {
