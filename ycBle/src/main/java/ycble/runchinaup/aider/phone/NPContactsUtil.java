@@ -178,9 +178,21 @@ public final class NPContactsUtil {
         String numberFormat0 = number;
         String numberFormat1 = "86" + number;
         String numberFormat2 = "+86" + number;
-        String numberFormat3 = null;
+        String numberFormat3 = number;
+        String numberFormat4 = number;
+        String numberFormat5 = number;
+        String numberFormat6 = number;
+        String numberFormat7 = number;
+        String numberFormat8 = number;
+        String numberFormat9 = number;
         if (number.length() == 11) {
             numberFormat3 = number.substring(0, 3) + " " + number.substring(3, 7) + " " + number.substring(7);
+            numberFormat4 = "86" + numberFormat3;
+            numberFormat5 = "+86" + numberFormat3;
+            numberFormat6 = "86 " + numberFormat3;
+            numberFormat7 = "+86 " + numberFormat3;
+            numberFormat8 = " 86 " + numberFormat3;
+            numberFormat9 = " +86 " + numberFormat3;
         }
 
         Uri uri = Data.CONTENT_URI; // 联系人Uri；
@@ -190,6 +202,18 @@ public final class NPContactsUtil {
                 .append(Data.DATA1).append("=? or ")
                 .append(Data.DATA1).append("=? or ")
                 .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA1).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
+                .append(Data.DATA4).append("=? or ")
                 .append(Data.DATA4).append("=? or ")
                 .append(Data.DATA4).append("=? or ")
                 .append(Data.DATA4).append("=? or ")
@@ -197,8 +221,8 @@ public final class NPContactsUtil {
                 .toString();
 
         String[] selectionArgs = new String[]{
-                numberFormat0, numberFormat1, numberFormat2, numberFormat3,
-                numberFormat0, numberFormat1, numberFormat2, numberFormat3};
+                numberFormat0, numberFormat1, numberFormat2, numberFormat3, numberFormat4, numberFormat5, numberFormat6, numberFormat7, numberFormat8, numberFormat9,
+                numberFormat0, numberFormat1, numberFormat2, numberFormat3, numberFormat4, numberFormat5, numberFormat6, numberFormat7, numberFormat8, numberFormat9};
 
 //        selectionSql = null;
 //        selectionArgs = null;
