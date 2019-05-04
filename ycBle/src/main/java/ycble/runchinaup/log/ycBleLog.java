@@ -76,15 +76,20 @@ public class ycBleLog {
         }
 
         if (TextUtils.isEmpty(logMac)) return;
-        if (allowWriteLogToLocalFile) {
-            String dateTime = smp.format(new Date());
-            writeFile(dateTime + "  " + content);
-        }
+//        if (allowWriteLogToLocalFile) {
+//            String dateTime = smp.format(new Date());
+//            writeFile(dateTime + "  " + content);
+//        }
     }
 
     public static void w(String content) {
         if (!allowW) return;
         Log.w(npBleTag, content);
+    }
+
+    public static void i(String content) {
+        if (!allowW) return;
+        Log.i(npBleTag, content);
     }
 
     public static void d(String content) {

@@ -5,6 +5,9 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 -->
@@ -24,6 +27,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".backgroundLive.MainBackLiveService"
+            android:enabled="true"
+            android:exported="false"
+            android:persistent="true"
+            android:priority="1000" />
+
+        <service
+            android:name=".backgroundLive.GuardLiveService"
+            android:enabled="true"
+            android:exported="true"
+            android:persistent="true"
+            android:priority="1000"
+            android:process=":GuardLiveService"></service>
+        <service
+            android:name=".backgroundLive.MyJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+
+        <receiver android:name=".backgroundLive.extra.TimeChangeStaticReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_TICK" />
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>

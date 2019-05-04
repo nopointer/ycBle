@@ -206,4 +206,45 @@ public class BleUtil {
     }
 
 
+    /**
+     * 反转byte数组
+     *
+     * @param a
+     * @return
+     */
+    public static byte[] reverse(byte[] a) {
+        if (a == null)
+            return null;
+
+        int p1 = 0, p2 = a.length;
+        byte[] result = new byte[p2];
+
+        while (--p2 >= 0) {
+            result[p2] = a[p1++];
+        }
+        return result;
+    }
+
+
+    /**
+     * 反转byte数组中的某一段
+     *
+     * @param arr
+     * @param begin
+     * @param end
+     * @return
+     */
+    public static byte[] reverse(byte[] arr, int begin, int end) {
+
+        while (begin < end) {
+            byte temp = arr[end];
+            arr[end] = arr[begin];
+            arr[begin] = temp;
+            begin++;
+            end--;
+        }
+
+        return arr;
+    }
+
 }

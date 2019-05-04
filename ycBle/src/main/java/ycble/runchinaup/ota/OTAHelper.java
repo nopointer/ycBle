@@ -7,6 +7,7 @@ import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.ota.absimpl.htx.HTXOTAHelper;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
+import ycble.runchinaup.ota.absimpl.telink.TeLinkOTAHelper;
 import ycble.runchinaup.ota.callback.OTACallback;
 
 /**
@@ -55,6 +56,9 @@ public class OTAHelper {
                 htxotaHelper.setDeviceMac(mac);
                 htxotaHelper.setOtaCallback(otaCallback);
                 htxotaHelper.startOTA(context);
+                break;
+            case TELINK:
+                TeLinkOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
         }
     }
