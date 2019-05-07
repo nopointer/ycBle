@@ -74,12 +74,11 @@ public class ycBleLog {
         if (allowE) {
             Log.e(npBleTag, content);
         }
-
         if (TextUtils.isEmpty(logMac)) return;
-//        if (allowWriteLogToLocalFile) {
-//            String dateTime = smp.format(new Date());
-//            writeFile(dateTime + "  " + content);
-//        }
+        if (allowWriteLogToLocalFile) {
+            String dateTime = smp.format(new Date());
+            writeFile(dateTime + "  " + content);
+        }
     }
 
     public static void w(String content) {

@@ -20,7 +20,6 @@ public enum MsgType {
     SKPE,
     //千牛
     QIANNIU,
-
     KaKaoTalk,
     Messenger,
     LinkedIn,
