@@ -25,6 +25,10 @@ public enum MsgType {
     LinkedIn,
     DingDind,
     Viber,
+    //VK 俄罗斯设计软件
+    VK,
+    //新浪微博
+    SINA_WEIBO,
     Instagram;
 
     public static MsgType pck2MsgType(String pkhName) {
@@ -59,6 +63,10 @@ public enum MsgType {
                 return Instagram;
             case "com.alibaba.android.rimet":
                 return DingDind;
+            case "com.vkontakte.android":
+                return VK;
+            case "com.sina.weibo":
+                return SINA_WEIBO;
         }
         return null;
     }
