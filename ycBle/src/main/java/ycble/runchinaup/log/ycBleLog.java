@@ -67,7 +67,7 @@ public class ycBleLog {
     //是否允许把日志文件写在本地文件里面
     public static boolean allowWriteLogToLocalFile = true;
 
-    private static SimpleDateFormat smp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat smp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 
     public static void e(String content) {
