@@ -34,7 +34,8 @@ public enum MsgType {
                 return MsgType.QQ;
             case "com.tencent.mm"://微信
                 return MsgType.WECHAT;
-            case "com.skype.raider"://akype
+            case "com.skype.raider"://skype
+            case "com.skype.rover":
                 return MsgType.SKPE;
             case "com.whatsapp"://whatsapp
                 return MsgType.WHATSAPP;
