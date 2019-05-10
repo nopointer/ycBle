@@ -183,7 +183,12 @@ public final class AbsBleConnManger {
                 //如果有拦截蓝牙连接的请求，此时一定要断开
                 if (boolIsInterceptConn) {
                     ycBleLog.e("================有拦截请求，此处断开，从广播里面去拿断开的情况");
-                    gatt.disconnect();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            gatt.disconnect();
+                        }
+                    },200);
                     return;
                 }
 
