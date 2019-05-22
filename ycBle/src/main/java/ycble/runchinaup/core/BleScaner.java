@@ -257,6 +257,10 @@ public class BleScaner {
             ycBleLog.e(npBleTag + " 蓝牙没有打开--");
             return;
         }
+        if (isScanForConn) {
+            ycBleLog.e(npBleTag + "正在扫描（for连接），不需要再开始扫描");
+            return;
+        }
         isScanForConn = true;
         judgeScanOrStop();
     }
@@ -265,6 +269,10 @@ public class BleScaner {
         init();
         if (!isEnabled()) {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
+            return;
+        }
+        if (!isScanForConn) {
+            ycBleLog.e(npBleTag + "停止扫描（for连接），不需要再停止扫描");
             return;
         }
         isScanForConn = false;

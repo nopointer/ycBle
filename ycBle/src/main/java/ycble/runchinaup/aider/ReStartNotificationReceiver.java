@@ -4,17 +4,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.service.notification.NotificationListenerService;
+
+import ycble.runchinaup.log.ycBleLog;
 
 /**
  * Created by nopointer on 2018/7/26.
+ * 重新启动通知栏的辅助广播接收器
  */
 
-class NPLiveReceiver extends BroadcastReceiver {
+class ReStartNotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
 //        LogUtil.e("NPLiveReceiver==>" + intent.getAction());
-        NotificationMsgUtil.ensureCollectorRunning(context);
+        boolean result = NotificationMsgUtil.isServiceExisted(context, NPNotificationService.class);
+        ycBleLog.e("通知打开与否:" + result);
     }
 
     /**
@@ -24,8 +29,11 @@ class NPLiveReceiver extends BroadcastReceiver {
      */
     public static IntentFilter createIntentFilter() {
         IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        //时间变化
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        //亮屏
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        //黑屏
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         return intentFilter;
     }

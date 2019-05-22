@@ -1,14 +1,16 @@
 package ycble.runchinaup.aider;
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
-import java.util.ArrayList;
+import com.google.gson.Gson;
+
 import java.util.List;
 import java.util.Set;
 
@@ -24,8 +26,6 @@ final class NotificationMsgUtil {
 
     //读取通知栏消息
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
-    //设置打开通知栏读取权限
-    private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
 
     /**
      * 判断消息栏通知权限是否授权
@@ -34,28 +34,14 @@ final class NotificationMsgUtil {
      * @return
      */
     public static boolean isEnabled(Context context) {
-
-//        return NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.getPackageName());
-
         Set<String> packageNames = NotificationManagerCompat.getEnabledListenerPackages(context);
-        debug(packageNames);
-        if (packageNames.contains(context.getPackageName())) {
-            return true;
-        }
-        return false;
+        ycBleLog.e("获取了通知栏监听权限的应用包名:" + new Gson().toJson(packageNames));
+        return packageNames.contains(context.getPackageName());
     }
 
-
-    private static void debug(Set<String> packageNames) {
-        List<String> list = new ArrayList<>();
-        for (String string : packageNames) {
-            list.add(string);
-        }
-        ycBleLog.e("获取了通知栏监听权限的应用包名:" + list.toString());
-    }
 
     /**
-     * 前往设置允许通知栏权限
+     * 前往设置通知栏权限
      *
      * @param context
      */
@@ -70,6 +56,11 @@ final class NotificationMsgUtil {
     }
 
 
+    /**
+     * 前往设置辅助功能
+     *
+     * @param context
+     */
     public static void goToSettingAccessibility(Context context) {
         try {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -78,11 +69,6 @@ final class NotificationMsgUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    //确认NotificationMonitor是否开启
-    public static void ensureCollectorRunning(Context context) {
-        startNotifyService(context);
     }
 
 
@@ -95,19 +81,47 @@ final class NotificationMsgUtil {
         pm.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
-    public static void startNotifyService(Context context) {
+    /**
+     * 关闭服务
+     *
+     * @param context
+     */
+    public static void closeService(Context context) {
+        ComponentName thisComponent = new ComponentName(context, NPNotificationService.class);
+        PackageManager pm = context.getPackageManager();
+        pm.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, NPNotificationService.class));
-            context.startForegroundService(new Intent(context, NPAccessibilityService.class));
+
+    /**
+     * 判断某个服务是否正在运行的方法
+     *
+     * @param context
+     * @param clazz   是包名+服务的类名（例如：net.loonggg.testbackstage.TestService）
+     * @return true代表正在运行，false代表服务没有正在运行
+     */
+    public static boolean isServiceExisted(Context context, Class clazz) {
+        String className = clazz.getName();
+        Log.e("class名称:", className);
+        ActivityManager activityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> serviceList = activityManager
+                .getRunningServices(Integer.MAX_VALUE);
+
+        if (!(serviceList.size() > 0)) {
+            return false;
         }
-        context.startService(new Intent(context, NPNotificationService.class));
-        context.startService(new Intent(context, NPAccessibilityService.class));
+
+        for (int i = 0; i < serviceList.size(); i++) {
+            ActivityManager.RunningServiceInfo serviceInfo = serviceList.get(i);
+            ComponentName serviceName = serviceInfo.service;
+
+            if (serviceName.getClassName().equals(className)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public static void stopNotifyService(Context context) {
-        context.stopService(new Intent(context, NPNotificationService.class));
-//        context.stopService(new Intent(context, NPAccessibilityService.class));
-    }
 
 }
