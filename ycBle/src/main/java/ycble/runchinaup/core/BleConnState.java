@@ -7,10 +7,6 @@ package ycble.runchinaup.core;
 public enum BleConnState {
 
     /**
-     * 搜索设备中
-     */
-    SEARCH_ING,
-    /**
      * 请求连接中
      */
     CONNECTING,
