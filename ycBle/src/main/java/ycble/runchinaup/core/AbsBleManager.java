@@ -172,6 +172,12 @@ public abstract class AbsBleManager implements ConnScanListener {
             return;
         }
 
+        if (isConnectIng) {
+            ycBleLog.e("ble-当前已经发出了连接请求，还没响应，不需要再发送这次请求");
+            withBleConnState(BleConnState.CONNECTING);
+            return;
+        }
+
         if (isOTAMode) {
             ycBleLog.e("醒醒吧 现在是在OTA模式下");
             return;
