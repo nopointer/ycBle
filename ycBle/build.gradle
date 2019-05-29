@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 69
-        versionName "beta_0.0.69"
+        versionCode 70
+        versionName "beta_0.0.70"
     }
 
     buildTypes {
