@@ -81,6 +81,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BleScaner.getBleScaner().stopScan(this);
+        BleScaner.getBleScaner().stopScan();
     }
 }

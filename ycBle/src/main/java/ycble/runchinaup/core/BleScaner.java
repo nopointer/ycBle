@@ -257,6 +257,7 @@ public class BleScaner {
             ycBleLog.e(npBleTag + " 蓝牙没有打开--");
             return;
         }
+        if (isScanForConn) return;
         isScanForConn = true;
         judgeScanOrStop();
     }
@@ -267,6 +268,7 @@ public class BleScaner {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
             return;
         }
+        if (!isScanForConn) return;
         isScanForConn = false;
         judgeScanOrStop();
     }
