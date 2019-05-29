@@ -1,6 +1,9 @@
 package lib.ycble;
 
 import android.app.Application;
+import android.util.Log;
+
+import ycble.runchinaup.core.ycBleSDK;
 
 public class MainApplication extends Application {
 
@@ -10,8 +13,9 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        ycBleSDK.initSDK(this);
+        ycBleSDK.initSDK(this);
         mainApplication = this;
+        Log.e("tag", this.toString());
 //        PushAiderHelper.getAiderHelper().setMsgReceiveCallback(new MsgCallback() {
 //            @Override
 //            public void onAppMsgReceive(String packName, MsgType msgType, String from, String msgContent) {
