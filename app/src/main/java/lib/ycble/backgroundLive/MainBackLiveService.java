@@ -1,5 +1,6 @@
 package lib.ycble.backgroundLive;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,15 +8,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import lib.ycble.backgroundLive.extra.TimeChangeReceiver;
+import lib.ycble.MainActivity;
+import lib.ycble.R;
+import lib.ycble.backgroundLive.extra.AliveBroadcastReceiver;
+import lib.ycble.backgroundLive.utils.BackLog;
 import lib.ycble.backgroundLive.utils.ServiceUtils;
 
 /**
  * 后台运行的主service
  */
-public class MainBackLiveService extends Service implements TimeChangeReceiver.OnTimeChangeCallback {
+public class MainBackLiveService extends Service implements AliveBroadcastReceiver.OnBroadcastReceiveCallback {
 
     private static String Tag = "MainBackLiveService";
 
@@ -24,8 +27,8 @@ public class MainBackLiveService extends Service implements TimeChangeReceiver.O
     @Override
     public void onCreate() {
         super.onCreate();
-        logE("onCreate 创建service");
-        TimeChangeReceiver.getInstance().register(this, this);
+        BackLog.e("onCreate 创建service" + MainBackLiveService.this);
+        AliveBroadcastReceiver.getInstance().register(this, this);
     }
 
 
@@ -37,51 +40,60 @@ public class MainBackLiveService extends Service implements TimeChangeReceiver.O
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        logE("onStartCommand 开始 service");
+        BackLog.e("onStartCommand 开始 service" + MainBackLiveService.this);
         startAndBindGuardService();
         return super.onStartCommand(intent, flags, startId);
     }
 
-
-    public void debug(String message) {
-        logE(message);
+    private void startNotification() {
+        NotificationInfoBean notificationInfoBean = new NotificationInfoBean();
+        notificationInfoBean.setContext(this);
+        notificationInfoBean.setTitle("Title");
+        notificationInfoBean.setSmallIconResId(R.mipmap.ic_launcher);
+        notificationInfoBean.setMessage("Message");
+        notificationInfoBean.setPendingActivity(MainActivity.class);
+        Notification notification = AliveNotificationManager.createAppNotification(notificationInfoBean);
+        AliveNotificationManager.getInstance().sendNotification(this, notification);
+        startForeground(AliveNotificationManager.getInstance().getNotificationId(), notification);
     }
 
-
-    static void logE(String message) {
-        Log.e(Tag, message);
-    }
 
     private void startAndBindGuardService() {
         boolean isGuardRun = ServiceUtils.isServiceExisted(this, GuardLiveService.class);
-        logE("守护进程运行的状态:" + isGuardRun);
+        BackLog.e("守护进程运行的状态:" + isGuardRun);
         if (!isGuardRun) {
-            logE("准备启动守护service");
+            BackLog.e("准备启动守护service");
             Intent intent = new Intent(new Intent(this, GuardLiveService.class));
             serviceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder iBinder) {
                     RunServiceInterface process = RunServiceInterface.Stub.asInterface(iBinder);
-                    logE("绑定守护service成功了");
+                    BackLog.e("绑定守护service成功了");
                 }
 
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
-                    logE("GuardLiveService 远程服务挂掉了,远程服务被杀死");
+                    BackLog.e("GuardLiveService 远程服务挂掉了,远程服务被杀死");
                 }
 
                 @Override
                 public void onBindingDied(ComponentName name) {
-                    logE("GuardLiveService 远程服务挂掉了,远程服务被杀死");
+                    BackLog.e("GuardLiveService 远程服务挂掉了,远程服务被杀死");
                 }
             };
             startService(intent);
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
+        BackLog.e("通知是否可见:" + AliveNotificationManager.getInstance().isNotifyShow());
+        if (!AliveNotificationManager.getInstance().isNotifyShow()) {
+            startNotification();
+        } else {
+
+        }
     }
 
     @Override
-    public void onTimeChange() {
+    public void onBroadcastReceive(String action) {
         startAndBindGuardService();
     }
 
@@ -92,11 +104,12 @@ public class MainBackLiveService extends Service implements TimeChangeReceiver.O
             if (serviceConnection != null) {
                 unbindService(serviceConnection);
             }
-            TimeChangeReceiver.getInstance().unRegister(this);
+            AliveBroadcastReceiver.getInstance().unRegister(this, this);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     public class MainBackLiveServiceBinder extends RunServiceInterface.Stub {
 

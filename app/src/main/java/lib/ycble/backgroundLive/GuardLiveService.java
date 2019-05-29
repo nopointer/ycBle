@@ -7,22 +7,24 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import lib.ycble.backgroundLive.extra.TimeChangeReceiver;
+import lib.ycble.backgroundLive.extra.AliveBroadcastReceiver;
+import lib.ycble.backgroundLive.utils.BackLog;
 import lib.ycble.backgroundLive.utils.ServiceUtils;
 
-public class GuardLiveService extends Service implements TimeChangeReceiver.OnTimeChangeCallback {
+/**
+ * 守护进程，用来启动主后台进程
+ */
+public class GuardLiveService extends Service implements AliveBroadcastReceiver.OnBroadcastReceiveCallback {
 
-
-    private static String Tag = "GuardLiveService";
 
     private ServiceConnection serviceConnection;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        TimeChangeReceiver.getInstance().register(this, this);
+        //注册时间变化的广播监听
+        AliveBroadcastReceiver.getInstance().register(this,this);
     }
 
     @Nullable
@@ -34,32 +36,35 @@ public class GuardLiveService extends Service implements TimeChangeReceiver.OnTi
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        logE("onStartCommand 开始 service");
+        BackLog.e("onStartCommand 开始 service"+GuardLiveService.this);
         startAndBindMainBgService();
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * 开始或者绑定主后台进程
+     */
     private void startAndBindMainBgService() {
         boolean isGuardRun = ServiceUtils.isServiceExisted(this, MainBackLiveService.class);
-        logE("主进程运行的状态:" + isGuardRun);
+        BackLog.e("主进程运行的状态:" + isGuardRun);
         if (!isGuardRun) {
-            logE("准备启动守护service");
+            BackLog.e("准备启动守护service");
             Intent intent = new Intent(new Intent(this, MainBackLiveService.class));
             serviceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder iBinder) {
                     RunServiceInterface process = RunServiceInterface.Stub.asInterface(iBinder);
-                    logE("绑定主后台service成功了");
+                    BackLog.e("绑定主后台service成功了");
                 }
 
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
-                    logE("MainBackLiveService 远程服务挂掉了,远程服务被杀死");
+                    BackLog.e("MainBackLiveService 远程服务挂掉了,远程服务被杀死");
                 }
 
                 @Override
                 public void onBindingDied(ComponentName name) {
-                    logE("MainBackLiveService 远程服务挂掉了,远程服务被杀死");
+                    BackLog.e("MainBackLiveService 远程服务挂掉了,远程服务被杀死");
                 }
             };
             startService(intent);
@@ -68,7 +73,7 @@ public class GuardLiveService extends Service implements TimeChangeReceiver.OnTi
     }
 
     @Override
-    public void onTimeChange() {
+    public void onBroadcastReceive(String action) {
         startAndBindMainBgService();
     }
 
@@ -79,21 +84,12 @@ public class GuardLiveService extends Service implements TimeChangeReceiver.OnTi
             if (serviceConnection != null) {
                 unbindService(serviceConnection);
             }
-            TimeChangeReceiver.getInstance().unRegister(this);
+            AliveBroadcastReceiver.getInstance().unRegister(this,this);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
-    public void debug(String message) {
-        logE(message);
-    }
-
-
-    static void logE(String message) {
-        Log.e(Tag, message);
-    }
+    
 
 
 
@@ -103,8 +99,6 @@ public class GuardLiveService extends Service implements TimeChangeReceiver.OnTi
             return GuardLiveService.this;
         }
     }
-
-
 
 
 }

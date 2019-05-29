@@ -10,7 +10,6 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
-import android.text.TextUtils;
 
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +27,7 @@ import static ycble.runchinaup.BleCfg.npBleTag;
  * 蓝牙扫描
  */
 
-public class BleScaner {
+public final class BleScaner {
 
     private static BleScaner bleScaner = new BleScaner();
 
@@ -40,33 +39,19 @@ public class BleScaner {
     protected static boolean isShowScanLog = true;
 
     //线程池
-    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(10);
+    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(33);
 
     //========================================
     //  单例模板              =================
     //========================================
 
-    //是否是在做常规的扫描
-    private boolean isScanForNormal = false;
-    //是否是在做为了连接的扫描
-    private boolean isScanForConn = false;
 
+    /**
+     * 构造函数
+     */
     private BleScaner() {
-        init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-            if (bluetoothLeScanner == null) {
-                bluetoothLeScanner = adapter.getBluetoothLeScanner();
-            }
-            if (scanSettings == null) {
-                ScanSettings.Builder builder = new ScanSettings.Builder();
-                builder.setScanMode(SCAN_MODE_LOW_LATENCY);
-                scanSettings = builder.build();
-            }
-        }
     }
 
-    private static Context mContext = null;
     //蓝牙适配器
     private BluetoothAdapter adapter = null;
     //5.0以后的蓝牙扫描
@@ -78,28 +63,24 @@ public class BleScaner {
     //========================================
     //  扫描部分              =================
     //========================================
-    private boolean isScan = false;
+    /**
+     * 是否正在扫描
+     */
+    private boolean isScaning = false;
     private HashSet<ScanListener> scanListenerHashSet = new HashSet<>();
 
     public boolean isEnabled() {
-        return adapter.isEnabled();
+        return BluetoothAdapter.getDefaultAdapter().isEnabled();
     }
 
-    //初始化蓝牙设备
-    public static void initSDK(Context context) {
-        mContext = context;
-    }
 
-    private void init() {
-        if (mContext == null) {
+    private synchronized void init(Context context) {
+
+        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        if (bluetoothManager == null) {
             adapter = BluetoothAdapter.getDefaultAdapter();
         } else {
-            BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
-            if (bluetoothManager == null) {
-                adapter = BluetoothAdapter.getDefaultAdapter();
-            } else {
-                adapter = bluetoothManager.getAdapter();
-            }
+            adapter = bluetoothManager.getAdapter();
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -116,18 +97,12 @@ public class BleScaner {
                                 if (isShowScanLog) {
                                     ycBleLog.e("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
                                 }
-                                if (isScanForNormal) {
-                                    if (bleDeviceFilter != null) {
-                                        if (bleDeviceFilter.filter(bleDevice)) {
-                                            onScan(bleDevice);
-                                        }
-                                    } else {
-                                        onScan(bleDevice);
+                                if (bleDeviceFilter != null) {
+                                    if (bleDeviceFilter.filter(bleDevice)) {
+                                        notifyScan(bleDevice);
                                     }
-                                }
-                                //如果用户需要管理的设备 还在的话,是要回调回去的
-                                if (!TextUtils.isEmpty(scanForMyDeviceMac) && bleDevice.getMac().equals(scanForMyDeviceMac) && connScanListener != null) {
-                                    connScanListener.scanMyDevice(bleDevice);
+                                } else {
+                                    notifyScan(bleDevice);
                                 }
                             }
                         });
@@ -140,12 +115,6 @@ public class BleScaner {
                     }
                 };
             }
-            if (adapter == null) {
-                adapter = BluetoothAdapter.getDefaultAdapter();
-            }
-            if (bluetoothLeScanner == null) {
-                bluetoothLeScanner = adapter.getBluetoothLeScanner();
-            }
         }
         if (scanCallback43 == null) {
             scanCallback43 = new BluetoothAdapter.LeScanCallback() {
@@ -155,55 +124,62 @@ public class BleScaner {
                         @Override
                         public void run() {
                             BleDevice bleDevice = BleDevice.parserFromScanData(device, scanRecord, rssi);
+                            ycBleLog.e("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
                             //如果是常规的扫描正在进行的话
-                            if (isScanForNormal) {
-                                if (bleDeviceFilter != null) {
-                                    if (bleDeviceFilter.filter(bleDevice)) {
-                                        onScan(bleDevice);
-                                    }
-                                } else {
-                                    onScan(bleDevice);
+                            if (bleDeviceFilter != null) {
+                                if (bleDeviceFilter.filter(bleDevice)) {
+                                    notifyScan(bleDevice);
                                 }
-                            }
-                            //如果用户需要管理的设备 还在的话,是要回调回去的
-                            if (!TextUtils.isEmpty(scanForMyDeviceMac) && bleDevice.getMac().equals(scanForMyDeviceMac) && connScanListener != null) {
-                                connScanListener.scanMyDevice(bleDevice);
+                            } else {
+                                notifyScan(bleDevice);
                             }
                         }
                     });
                 }
             };
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (bluetoothLeScanner == null) {
+                bluetoothLeScanner = adapter.getBluetoothLeScanner();
+            }
+            if (scanSettings == null) {
+                ScanSettings.Builder builder = new ScanSettings.Builder();
+                builder.setScanMode(SCAN_MODE_LOW_LATENCY);
+                scanSettings = builder.build();
+            }
+        }
     }
 
     BluetoothLeScanner bluetoothLeScanner = null;
     ScanSettings scanSettings = null;
 
-    public void startScan() {
-        init();
+    public void startScan(Context context) {
+        init(context);
         if (!isEnabled()) {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
             return;
         }
-        ycBleLog.e("要求开始扫描设备,当前扫描状态:" + isScan);
-        isScanForNormal = true;
-        if (isScan) {
+        ycBleLog.e("要求开始扫描设备,当前扫描状态:" + isScaning);
+        if (isScaning) {
             return;
         }
+        isScaning = true;
         judgeScanOrStop();
     }
 
 
-    public void stopScan() {
-        init();
+    public void stopScan(Context context) {
+        init(context);
         if (!isEnabled()) {
             ycBleLog.w(npBleTag + " 蓝牙没有打开--");
             return;
         }
-        isScanForNormal = false;
-        if (!isScan) {
+        ycBleLog.e("要求停止扫描设备,当前扫描状态:" + isScaning);
+        if (!isScaning) {
             return;
         }
+        isScaning = false;
         judgeScanOrStop();
     }
 
@@ -228,55 +204,20 @@ public class BleScaner {
     }
 
 
-    private void onScan(BleDevice bleDevice) {
+    /**
+     * 通知扫描回调
+     *
+     * @param bleDevice
+     */
+    private void notifyScan(BleDevice bleDevice) {
         for (ScanListener scanListener : scanListenerHashSet) {
             scanListener.onScan(bleDevice);
         }
     }
 
-
-    //针对连接的回调，不需要个普通扫描去做切换了
-    private ConnScanListener connScanListener = null;
-
-    protected void setConnScanListener(ConnScanListener connScanListener) {
-        this.connScanListener = connScanListener;
-    }
-
-    //针对我的设备的mac地址
-    private String scanForMyDeviceMac = null;
-
-    public void setScanForMyDeviceMac(String scanForMyDeviceMac) {
-        this.scanForMyDeviceMac = scanForMyDeviceMac;
-    }
-
-
-    //连接的扫描 不影响普通的扫描
-    protected void startScanForConn() {
-        init();
-        if (!isEnabled()) {
-            ycBleLog.e(npBleTag + " 蓝牙没有打开--");
-            return;
-        }
-        isScanForConn = true;
-        judgeScanOrStop();
-    }
-
-    protected void stopScanForConn() {
-        init();
-        if (!isEnabled()) {
-            ycBleLog.w(npBleTag + " 蓝牙没有打开--");
-            return;
-        }
-        isScanForConn = false;
-        judgeScanOrStop();
-    }
-
     private void judgeScanOrStop() {
-        ycBleLog.e(" 当前扫描状态:==>isScanForNormal:" + isScanForNormal);
-        ycBleLog.e(" 当前扫描状态:==>isScanForConn:" + isScanForConn);
 
-        isScan = isScanForConn || isScanForNormal;
-        if (isScan) {
+        if (isScaning) {
             if (Build.VERSION.SDK_INT < 21) {
                 adapter.startLeScan(scanCallback43);
             } else {

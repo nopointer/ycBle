@@ -18,33 +18,24 @@ public final class PushAiderHelper {
 
     private MsgNotifyHelper notifyHelper = MsgNotifyHelper.getMsgNotifyHelper();
 
-    private Context context =null;
 
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
 
     public void start(Context context) {
         try {
             //常用的系统广播
-            this.context =context;
-            context.registerReceiver(npLiveReceiver, NPLiveReceiver.createIntentFilter());
-            registerReceiver();
-            NotificationMsgUtil.startNotifyService(context);
+            context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
+            NotificationMsgUtil.reBindService(context);
+            registerReceiver(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void stop() {
+    public void stop(Context context) {
         try {
             context.unregisterReceiver(npLiveReceiver);
-            NotificationMsgUtil.stopNotifyService(context);
-            unregisterReceiver();
+            NotificationMsgUtil.closeService(context);
+            unregisterReceiver(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,17 +53,17 @@ public final class PushAiderHelper {
     }
 
     //是否有通知栏监听消息的权限
-    public boolean isNotifyEnable() {
+    public boolean isNotifyEnable(Context context) {
         return NotificationMsgUtil.isEnabled(context);
     }
 
     //前往设置通知权限授权界面
-    public void goToSettingNotificationAccess() {
+    public void goToSettingNotificationAccess(Context context) {
         NotificationMsgUtil.goToSettingNotificationAccess(context);
     }
 
     //前往打开辅助功能
-    public void goToSettingAccessibility() {
+    public void goToSettingAccessibility(Context context) {
         NotificationMsgUtil.goToSettingAccessibility(context);
     }
 
@@ -86,14 +77,14 @@ public final class PushAiderHelper {
     }
 
     //接收一些常用的广播接收器，用来激活通知栏，不让他挂掉
-    private NPLiveReceiver npLiveReceiver = new NPLiveReceiver();
+    private ReStartNotificationReceiver npLiveReceiver = new ReStartNotificationReceiver();
     //来电状态广播接收器
     private NPPhoneStateReceiver npPhoneStateReceiver = new NPPhoneStateReceiver();
     //短信接收广播接收器
     private NPSmsReciver npSmsReciver = new NPSmsReciver();
 
     //注册广播
-    private void registerReceiver() {
+    private void registerReceiver(Context context) {
         //注册来电状态的广播
         context.registerReceiver(npPhoneStateReceiver, NPPhoneStateReceiver.createIntentFilter());
         //注册短信接收的广播
@@ -101,7 +92,7 @@ public final class PushAiderHelper {
     }
 
 
-    private void unregisterReceiver() {
+    private void unregisterReceiver(Context context) {
         try {
             context.unregisterReceiver(npPhoneStateReceiver);
             context.unregisterReceiver(npSmsReciver);

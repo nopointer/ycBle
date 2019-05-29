@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 import ycble.runchinaup.core.callback.BleConnCallback;
-import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.exception.BleUUIDNullException;
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.util.BleUtil;
@@ -26,7 +24,7 @@ import static ycble.runchinaup.BleCfg.npBleTag;
  * 具体操作蓝牙交互的管理器
  */
 
-public abstract class AbsBleManager implements ConnScanListener {
+public abstract class AbsBleManager {
 
     /**
      * mac地址的正则匹配表达式
@@ -43,7 +41,6 @@ public abstract class AbsBleManager implements ConnScanListener {
 
     protected static void initSDK(Context context) {
         mContext = context;
-        BleScaner.initSDK(context);
     }
 
     //初始化
@@ -135,10 +132,7 @@ public abstract class AbsBleManager implements ConnScanListener {
      * 连接的设备mac地址
      */
     private String connMac = null;
-    /**
-     * 是否有扫描到这个设备
-     */
-    private boolean hasScanDevice = false;
+
 
     public String getMac() {
         if (absBleConnManger == null || absBleConnManger.getBluetoothGatt() == null) {
@@ -160,7 +154,6 @@ public abstract class AbsBleManager implements ConnScanListener {
         }
         if (isConn) {
             ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
-            myBleScaner.stopScanForConn();
             return;
         }
         if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
@@ -188,11 +181,8 @@ public abstract class AbsBleManager implements ConnScanListener {
             return;
         }
         ycBleLog.e("debug===扫描然后再连接我的设备===>超时时间:" + timeOutSecond);
-        hasScanDevice = false;
-        myBleScaner.setScanForMyDeviceMac(mac);
-        myBleScaner.setConnScanListener(this);
-        withBleConnState(BleConnState.SEARCH_ING);
-        myBleScaner.startScanForConn();
+        withBleConnState(BleConnState.CONNECTING);
+        connDevice(connMac);
         if (timeOutSecond == 0) return;
         handler.sendEmptyMessageDelayed(MSG_AFTER_SCAN_TIMEOUT, timeOutSecond * 1000);
     }
@@ -213,8 +203,6 @@ public abstract class AbsBleManager implements ConnScanListener {
     public void disConn() {
         clearSomeFlag();
         connMac = null;
-        myBleScaner.setScanForMyDeviceMac(null);
-        myBleScaner.stopScanForConn();
         isConnectIng = false;
         if (absBleConnManger != null) {
             absBleConnManger.disConnect();
@@ -732,42 +720,14 @@ public abstract class AbsBleManager implements ConnScanListener {
     }
 
 
-    @Override
-    public void scanMyDevice(final BleDevice bleDevice) {
-        if (bleDevice == null) return;
-        if (TextUtils.isEmpty(connMac)) return;
-        ycBleLog.e("扫描到了设备,handler里面发送消息==>" + bleDevice.toString());
-        handler.sendMessage(handler.obtainMessage(MSG_SCAN_DEVICE, bleDevice));
-    }
+//    @Override
+//    public void scanMyDevice(final BleDevice bleDevice) {
+//        if (bleDevice == null) return;
+//        if (TextUtils.isEmpty(connMac)) return;
+//        ycBleLog.e("扫描到了设备,handler里面发送消息==>" + bleDevice.toString());
+//        handler.sendMessage(handler.obtainMessage(MSG_SCAN_DEVICE, bleDevice));
+//    }
 
-
-    private synchronized void handScanDevice(final BleDevice bleDevice) {
-        if (bleDevice.getMac().equals(connMac)) {
-            if (!hasScanDevice) {
-                hasScanDevice = true;
-                myBleScaner.stopScanForConn();
-                handler.removeMessages(MSG_SCAN_DEVICE);
-                myBleScaner.setConnScanListener(null);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        connDevice(connMac);
-                    }
-                }, 1200);
-            }
-        }
-    }
-
-
-    /**
-     * task任务完成
-     */
-    static final int MSG_TASK_SUCCESS = 0x01;
-
-    /**
-     * 扫描到设备了
-     */
-    static final int MSG_SCAN_DEVICE = 0x02;
 
     /**
      * 扫描的超时时间到了，处理超时，如果超时时间为0 就不会回调此处
@@ -777,31 +737,7 @@ public abstract class AbsBleManager implements ConnScanListener {
     /**
      * 延时处理机制，或者
      */
-    private final Handler handler = new Handler() {
-        @Override
-        public synchronized void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                //扫描到设备了，处理是不是我的设备
-                case MSG_SCAN_DEVICE: {
-                    handScanDevice((BleDevice) msg.obj);
-                }
-                break;
-                //执行扫描超时后的时序
-                case MSG_AFTER_SCAN_TIMEOUT: {
-                    //担心会有在结束扫描的时候，同时又扫描到设备了，移除扫描到的消息
-                    handler.removeMessages(MSG_SCAN_DEVICE);
-                    if (!hasScanDevice) {
-                        myBleScaner.setConnScanListener(null);
-                        myBleScaner.stopScanForConn();
-                        ycBleLog.e("设备都不在附近 你连接个锤子，连接失败");
-                        withBleConnState(BleConnState.CONNFAILURE);
-                    }
-                }
-                break;
-            }
-        }
-    };
+    private final Handler handler = new Handler();
 
     //=======================================================================
     //=======================================================================

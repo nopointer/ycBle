@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 读写sdcard，storage等等 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:name="lib.ycble.MainApplication"
@@ -20,7 +21,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,17 +45,8 @@
             android:persistent="true"
             android:priority="1000"
             android:process=":GuardLiveService"></service>
-        <service
-            android:name=".backgroundLive.MyJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".BgService" />
 
-
-        <receiver android:name=".backgroundLive.extra.TimeChangeStaticReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.TIME_TICK" />
-            </intent-filter>
-
-        </receiver>
     </application>
 
 </manifest>
