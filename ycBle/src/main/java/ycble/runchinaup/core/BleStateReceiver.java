@@ -128,8 +128,8 @@ public class BleStateReceiver extends BroadcastReceiver {
 
             ycBleLog.e("相关的设备===>" + device.getName() + "/" + device.getAddress());
 
-            if (TextUtils.isEmpty(listenerMac) || !device.getAddress().equalsIgnoreCase(listenerMac)) {
-                ycBleLog.e("监听设备为空或者不属于本项目的设备，不需要往后执行......");
+            if (TextUtils.isEmpty(listenerMac)) {
+                ycBleLog.e("监听设备为空，不需要往后执行......");
                 return;
             }
             switch (action) {
