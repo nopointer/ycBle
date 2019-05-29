@@ -167,6 +167,13 @@ public abstract class AbsBleManager implements ConnScanListener {
             ycBleLog.e("mac地址都不对,地址要注意大写,且不能为空！！！！！");
             return;
         }
+
+        if (isConnectIng) {
+            ycBleLog.e("ble-当前已经发出了连接请求，还没响应，不需要再发送这次请求");
+            withBleConnState(BleConnState.CONNECTING);
+            return;
+        }
+
         if (!TextUtils.isEmpty(connMac) && !mac.equals(connMac)) {
             ycBleLog.e("连接新的设备之前，需先调用断开指令");
             return;
