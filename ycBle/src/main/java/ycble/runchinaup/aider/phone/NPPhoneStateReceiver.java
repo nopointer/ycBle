@@ -8,7 +8,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import ycble.runchinaup.aider.MsgNotifyHelper;
-import ycble.runchinaup.aider.PushAiderHelper;
 import ycble.runchinaup.log.ycBleLog;
 
 import static android.telephony.TelephonyManager.EXTRA_STATE_IDLE;
@@ -33,7 +32,7 @@ public final class NPPhoneStateReceiver extends BroadcastReceiver {
         if (action.equalsIgnoreCase(PHONE_STATE)) {
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             String extraIncomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-            onCallStateChanged(state, extraIncomingNumber);
+            onCallStateChanged(context,state, extraIncomingNumber);
         } else if (action.equalsIgnoreCase(Intent.ACTION_NEW_OUTGOING_CALL)) {
             ycBleLog.e("NPPhoneStateListener==>拨打电话出去");
         }
@@ -48,10 +47,10 @@ public final class NPPhoneStateReceiver extends BroadcastReceiver {
 
 
     //来电状态监听
-    public void onCallStateChanged(String state, String incomingNumber) {
+    public void onCallStateChanged(Context context,String state, String incomingNumber) {
         ycBleLog.e("state:" + state + ";incomingNumber:" + incomingNumber);
         if (TextUtils.isEmpty(incomingNumber)) return;
-        String name = NPContactsUtil.queryContact(PushAiderHelper.getAiderHelper().getContext(), incomingNumber);
+        String name = NPContactsUtil.queryContact(context, incomingNumber);
 
         if (state.equalsIgnoreCase(EXTRA_STATE_RINGING)) {
             ycBleLog.e("NPPhoneStateListener==>手机铃声响了，来电人:" + name);

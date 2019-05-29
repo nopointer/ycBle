@@ -32,9 +32,9 @@ public class BleManager extends AbsBleManager implements BleCfg {
     private static final SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
 
     private BleManager() {
-        init(imageDataNotifyUUID);
+        init();
         //初始化ble 日志文件夹
-        ycBleLog.initLogDirName("魔力宝");
+        ycBleLog.initLogDirName("ycBle");
         //配置单包数据的响应超时时间
         cfgTimeOutSinglePkgMilli = 1200;
         //配置多包数据的响应超时
@@ -144,8 +144,17 @@ public class BleManager extends AbsBleManager implements BleCfg {
 
 //            BleDevice bleDevice = SharedPrefereceDevice.read();
 //            if (bleDevice != null && !TextUtils.isEmpty(bleDevice.getMac())) {
-//                scanAndConn(bleDevice.getMac(), 0);
+
 //            }
+
+            ycBleLog.e("连接异常，开始重新连接");
+           handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ycBleLog.e("连接异常，开始重新连接1");
+                    scanAndConn("D2:A6:3E:E0:B6:1E", 0);
+                }
+            }, 3000);
         }
     }
 
@@ -212,18 +221,18 @@ public class BleManager extends AbsBleManager implements BleCfg {
         ycBleLog.e("基本指令同步完成....");
         ycBleLog.e("先拿到今天的步数....");
 //
-        try {
-            writeData(dataServiceUUID, dataWriteUUID, DevDataUtils.controlDevUI(1));
-        } catch (BleUUIDNullException e) {
-            e.printStackTrace();
-        }
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                devImageUtils.start();
-            }
-        }, 1000 * 21);
+//        try {
+//            writeData(dataServiceUUID, dataWriteUUID, DevDataUtils.controlDevUI(1));
+//        } catch (BleUUIDNullException e) {
+//            e.printStackTrace();
+//        }
+//
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                devImageUtils.start();
+//            }
+//        }, 1000 * 21);
 
 //        ycBleLog.e("先罗列一下设备功能列表:" + deviceFunction.toString());
 
@@ -714,16 +723,16 @@ public class BleManager extends AbsBleManager implements BleCfg {
             @Override
             public void onImageDataReceive(int transportIndex, byte[] imageData) {
 //                if (transportIndex < 1000) {
-                    byte[] imageDataByte = new byte[20];
-                    imageDataByte[0] = (byte) ((transportIndex & 0xff00) >> 8);
-                    imageDataByte[1] = (byte) (transportIndex & 0xff);
-                    System.arraycopy(imageData, 0, imageDataByte, 2, imageData.length);
+                byte[] imageDataByte = new byte[20];
+                imageDataByte[0] = (byte) ((transportIndex & 0xff00) >> 8);
+                imageDataByte[1] = (byte) (transportIndex & 0xff);
+                System.arraycopy(imageData, 0, imageDataByte, 2, imageData.length);
 //                        ycBleLog.e("第" + (transportIndex + 1) + "包数据是:" + BleUtil.byte2HexStr(imageDataByte));
-                    try {
-                        writeData(dataServiceUUID, imageDataWriteUUID, imageDataByte);
-                    } catch (BleUUIDNullException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    writeData(dataServiceUUID, imageDataWriteUUID, imageDataByte);
+                } catch (BleUUIDNullException e) {
+                    e.printStackTrace();
+                }
 //                } else {
 //                    onFinish();
 //                }
