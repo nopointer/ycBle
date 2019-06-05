@@ -3,9 +3,10 @@ package lib.ycble.backgroundLive.utils;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.util.Log;
 
 import java.util.List;
+
+import ycble.runchinaup.log.ycBleLog;
 
 public class ServiceUtils {
 
@@ -19,11 +20,9 @@ public class ServiceUtils {
      */
     public static boolean isServiceExisted(Context context, Class clazz) {
         String className = clazz.getName();
-        Log.e("class名称:", className);
-        ActivityManager activityManager = (ActivityManager) context
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningServiceInfo> serviceList = activityManager
-                .getRunningServices(Integer.MAX_VALUE);
+        ycBleLog.e("class名称:"+ className);
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> serviceList = activityManager.getRunningServices(Integer.MAX_VALUE);
 
         if (!(serviceList.size() > 0)) {
             return false;
@@ -32,7 +31,6 @@ public class ServiceUtils {
         for (int i = 0; i < serviceList.size(); i++) {
             ActivityManager.RunningServiceInfo serviceInfo = serviceList.get(i);
             ComponentName serviceName = serviceInfo.service;
-
             if (serviceName.getClassName().equals(className)) {
                 return true;
             }
