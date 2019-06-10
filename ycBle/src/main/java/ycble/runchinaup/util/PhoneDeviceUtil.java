@@ -2,6 +2,9 @@ package ycble.runchinaup.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
 import java.util.Locale;
@@ -72,5 +75,29 @@ public class PhoneDeviceUtil {
         }
         return null;
     }
+
+
+    /**
+     * 判断是否有该项或者多项权限
+     *
+     * @param context
+     * @param perms
+     * @return
+     */
+    public static boolean hasPermissions(Context context, String... perms) {
+        // Always return true for SDK < M, let the system deal with the permissions
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        for (String perm : perms) {
+            boolean hasPerm = (ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED);
+            if (!hasPerm) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
 }

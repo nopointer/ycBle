@@ -1,5 +1,6 @@
 package ycble.runchinaup.aider.phone;
 
+import android.Manifest;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import ycble.runchinaup.aider.entity.NPContactEntity;
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.util.PhoneDeviceUtil;
 
 
 /**
@@ -164,6 +166,11 @@ public final class NPContactsUtil {
      */
     public static String queryContact(Context context, String number) {
 
+        boolean hasPermission = PhoneDeviceUtil.hasPermissions(context, new String[]{Manifest.permission.READ_CONTACTS});
+        if (!hasPermission) {
+            ycBleLog.e("没有 Manifest.permission.READ_CONTACTS 权限！！！，返回原始号码");
+            return number;
+        }
         number = number.replace(" ", "").replace("-", "");
         if (number.startsWith("+86")) {
             number = number.substring(3);

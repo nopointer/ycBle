@@ -30,7 +30,7 @@ import static ycble.runchinaup.BleCfg.npBleTag;
 public final class AbsBleConnManger {
 
 
-    private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothAdapter bluetoothAdapter = null;
     //蓝牙状态接收器
     protected BleStateReceiver bleStateReceiver = BleStateReceiver.getInstance();
 
@@ -40,8 +40,22 @@ public final class AbsBleConnManger {
 
     public AbsBleConnManger(Context context) {
         this.context = context;
+        initBleAdapter();
     }
 
+
+    private void initBleAdapter() {
+        if (context == null) {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        } else {
+            BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+            if (bluetoothManager == null) {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            } else {
+                bluetoothAdapter = bluetoothManager.getAdapter();
+            }
+        }
+    }
 
     /**
      * 必须得uuid
@@ -61,6 +75,7 @@ public final class AbsBleConnManger {
     public void connect(String mac) {
         if (TextUtils.isEmpty(mac)) return;
         ycBleLog.e("发起连接请求的mac:" + mac);
+        initBleAdapter();
         BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(mac);
         connect(bluetoothDevice);
     }
@@ -188,7 +203,7 @@ public final class AbsBleConnManger {
                         public void run() {
                             gatt.disconnect();
                         }
-                    },200);
+                    }, 200);
                     return;
                 }
 
