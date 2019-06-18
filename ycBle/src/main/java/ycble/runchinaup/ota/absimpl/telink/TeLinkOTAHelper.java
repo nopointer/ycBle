@@ -9,6 +9,7 @@ import java.io.InputStream;
 
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.ota.OTAErrCode;
 import ycble.runchinaup.ota.callback.OTACallback;
 import ycble.runchinaup.util.BleUtil;
 
@@ -71,7 +72,7 @@ public class TeLinkOTAHelper {
                         break;
                     case Device.STATE_FAILURE:
                         if (otaCallback != null) {
-                            otaCallback.onFailure("failure");
+                            otaCallback.onFailure(OTAErrCode.TELINK_ERROR, "failure");
                         }
                         break;
                 }

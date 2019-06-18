@@ -8,6 +8,7 @@ import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
 import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.ota.OTAErrCode;
 import ycble.runchinaup.ota.OTAState;
 import ycble.runchinaup.ota.callback.OTACallback;
 
@@ -109,7 +110,7 @@ public class DfuHelper {
             ycBleLog.e("R.string.dfu_status_aborted");
 
             if (otaCallback != null) {
-                otaCallback.onFailure("");
+                otaCallback.onFailure(OTAErrCode.NRF_ABORTED,"DfuAborted");
             }
         }
 
@@ -125,7 +126,7 @@ public class DfuHelper {
         public void onError(final String deviceAddress, final int error, final int errorType, final String message) {
             ycBleLog.e("onError==" + error + ";" + message);
             if (otaCallback != null) {
-                otaCallback.onFailure(message);
+                otaCallback.onFailure(error,message);
             }
         }
     };

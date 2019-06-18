@@ -9,4 +9,5 @@ import ycble.runchinaup.device.BleDevice;
 
 public interface ScanListener<T extends BleDevice> {
     void onScan(T t);
+    void onFailure(int code);
 }

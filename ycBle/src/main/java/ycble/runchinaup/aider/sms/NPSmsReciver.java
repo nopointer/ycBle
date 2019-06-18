@@ -66,7 +66,7 @@ public class NPSmsReciver extends BroadcastReceiver {
                         messageContentBuilder.append(messageContent);
                     }
                 }
-                if (messageContentBuilder == null) {
+                if (TextUtils.isEmpty(messageContentBuilder.toString())) {
                     messageContentBuilder.append(messageWithNoPermissionText);
                 }
 
@@ -87,7 +87,23 @@ public class NPSmsReciver extends BroadcastReceiver {
     }
 
 
+    /**
+     * 设置没有短信相关权限的提示语，这个会推送到设备上（如果没有相关权限的话）
+     *
+     * @param messageWithNoPermissionText
+     */
     public static void setMessageWithNoPermissionText(String messageWithNoPermissionText) {
         NPSmsReciver.messageWithNoPermissionText = messageWithNoPermissionText;
     }
+
+    /**
+     * 清空上一次的短信内容
+     */
+    public static void clearLastMessage() {
+        if (strLastContent != null && TextUtils.isEmpty(strLastContent)) {
+            strLastContent = null;
+        }
+    }
+
+
 }

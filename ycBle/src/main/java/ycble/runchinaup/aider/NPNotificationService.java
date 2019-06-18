@@ -28,7 +28,7 @@ public final class NPNotificationService extends NotificationListenerService {
     /**
      * 最后一次数据，为了避免部分手机推送消息的时候，通知栏会收到2次回调
      */
-    private String lastMsgStr = null;
+    private static String lastMsgStr = null;
 
     @Override
     public void onCreate() {
@@ -99,6 +99,15 @@ public final class NPNotificationService extends NotificationListenerService {
         if (TextUtils.isEmpty(lastMsgStr) || !tmpStr.equals(lastMsgStr)) {
             MsgNotifyHelper.getMsgNotifyHelper().onAppMsgReceiver(pkhName, msgType, from, msgContent);
             lastMsgStr = tmpStr;
+        }
+    }
+
+    /**
+     * 清空上一次的消息内容
+     */
+    public static void clearLastMessage() {
+        if (lastMsgStr != null && !TextUtils.isEmpty(lastMsgStr)) {
+            lastMsgStr = null;
         }
     }
 

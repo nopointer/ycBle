@@ -7,12 +7,13 @@ import ycble.runchinaup.ota.OTAState;
  */
 public abstract class OTACallback {
 
+
     /**
      * 失败
      *
      * @param message
      */
-    public abstract void onFailure(String message);
+    public abstract void onFailure(int code, String message);
 
     /**
      * 成功

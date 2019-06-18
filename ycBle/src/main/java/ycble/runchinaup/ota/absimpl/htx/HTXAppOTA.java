@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.ota.OTAErrCode;
 import ycble.runchinaup.ota.callback.OTACallback;
 import ycble.runchinaup.util.BleUtil;
 
@@ -418,7 +419,7 @@ class HTXAppOTA {
                     if (isSuccess) {
                         otaCallback.onSuccess();
                     } else {
-                        otaCallback.onFailure("The connection is lost while OTA is working!");
+                        otaCallback.onFailure(OTAErrCode.LOST_CONN,"The connection is lost while OTA is working!");
                     }
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {
@@ -431,7 +432,7 @@ class HTXAppOTA {
                     if (isSuccess) {
                         otaCallback.onSuccess();
                     } else {
-                        otaCallback.onFailure("The connection is lost while OTA is working!");
+                        otaCallback.onFailure(OTAErrCode.LOST_CONN,"The connection is lost while OTA is working!");
                     }
                 }
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {

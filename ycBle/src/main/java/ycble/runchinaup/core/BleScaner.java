@@ -137,6 +137,15 @@ public class BleScaner {
                     public void onScanFailed(int errorCode) {
                         super.onScanFailed(errorCode);
                         ycBleLog.e("onScanFailed====>" + errorCode);
+                        onFailure(errorCode);
+//                        try {
+//                            bluetoothLeScanner.stopScan(scanCallback50);
+//                            bluetoothLeScanner.startScan(null, scanSettings, scanCallback50);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        } finally {
+//
+//                        }
                     }
                 };
             }
@@ -231,6 +240,12 @@ public class BleScaner {
     private void onScan(BleDevice bleDevice) {
         for (ScanListener scanListener : scanListenerHashSet) {
             scanListener.onScan(bleDevice);
+        }
+    }
+
+    private void onFailure(int code){
+        for (ScanListener scanListener : scanListenerHashSet) {
+            scanListener.onFailure(code);
         }
     }
 

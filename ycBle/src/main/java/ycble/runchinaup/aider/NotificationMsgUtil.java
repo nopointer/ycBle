@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -102,7 +101,6 @@ final class NotificationMsgUtil {
      */
     public static boolean isServiceExisted(Context context, Class clazz) {
         String className = clazz.getName();
-        Log.e("class名称:", className);
         ActivityManager activityManager = (ActivityManager) context
                 .getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> serviceList = activityManager

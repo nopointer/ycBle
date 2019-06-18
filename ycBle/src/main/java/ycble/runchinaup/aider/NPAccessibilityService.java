@@ -103,7 +103,7 @@ public class NPAccessibilityService extends AccessibilityService {
     }
 
     //最后一次数据，为了避免部分手机推送消息的时候，通知栏会收到2次回调
-    private String lastMsgStr = null;
+    private static String lastMsgStr = null;
 
     //处理消息，判断消息类型和来源
     public void handMsg(String pkhName, String from, String msgContent) {
@@ -121,6 +121,15 @@ public class NPAccessibilityService extends AccessibilityService {
         }
         if (msgType != null) {
             MsgNotifyHelper.getMsgNotifyHelper().onAppMsgReceiver(pkhName, msgType, from, msgContent);
+        }
+    }
+
+    /**
+     * 清空上一次的消息内容
+     */
+    public static void clearLastMessage() {
+        if (lastMsgStr != null && !TextUtils.isEmpty(lastMsgStr)) {
+            lastMsgStr = null;
         }
     }
 }

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.service.notification.NotificationListenerService;
 
 import ycble.runchinaup.log.ycBleLog;
 
@@ -19,7 +18,9 @@ class ReStartNotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 //        LogUtil.e("NPLiveReceiver==>" + intent.getAction());
         boolean result = NotificationMsgUtil.isServiceExisted(context, NPNotificationService.class);
-        ycBleLog.e("通知打开与否:" + result);
+        if (!result){
+            ycBleLog.e("通知没有打开");
+        }
     }
 
     /**
