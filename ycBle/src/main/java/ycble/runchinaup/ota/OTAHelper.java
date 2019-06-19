@@ -61,7 +61,7 @@ public class OTAHelper {
             case TELINK:
                 TeLinkOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
-            case FURUIKUN:
+            case FREQCHIP:
                 FreqchipOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
         }

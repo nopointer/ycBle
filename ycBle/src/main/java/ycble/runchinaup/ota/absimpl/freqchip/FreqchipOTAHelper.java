@@ -2,7 +2,6 @@ package ycble.runchinaup.ota.absimpl.freqchip;
 
 import android.content.Context;
 
-import ycble.runchinaup.core.ycBleSDK;
 import ycble.runchinaup.ota.callback.OTACallback;
 
 /**
@@ -18,10 +17,9 @@ public class FreqchipOTAHelper {
     private FreqchipOTAHelper() {
     }
 
-    private OTAImpl otaImpl = new OTAImpl();
+    private OTAImpl otaImpl = null;
 
     public void startOTA(Context context, String mac, String filePath, OTACallback otaCallback) {
-        ycBleSDK.initSDK(context);
         otaImpl = new OTAImpl();
         otaImpl.setFilePath(filePath);
         otaImpl.setOtaCallback(otaCallback);

@@ -10,7 +10,7 @@ public enum FirmType {
     SYD("盛源达"),
     TELINK("泰凌微"),
     HTX("汉天下"),
-    FURUIKUN("富芮坤");
+    FREQCHIP("富芮坤");
 
     private FirmType(String name) {
 
