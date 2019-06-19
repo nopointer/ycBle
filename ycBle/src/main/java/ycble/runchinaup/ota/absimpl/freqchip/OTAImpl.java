@@ -1,6 +1,7 @@
-package ycble.runchinaup.ota.absimpl.fuwokun;
+package ycble.runchinaup.ota.absimpl.freqchip;
 
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -18,11 +19,11 @@ import ycble.runchinaup.ota.OTAErrCode;
 import ycble.runchinaup.ota.callback.OTACallback;
 import ycble.runchinaup.util.BleUtil;
 
-import static ycble.runchinaup.ota.absimpl.fuwokun.FRKUtils.OTA_CMD_WRITE_DATA;
+import static ycble.runchinaup.ota.absimpl.freqchip.FreqchipUtils.OTA_CMD_WRITE_DATA;
 
 class OTAImpl extends AbsBleManager implements BleCfg {
 
-    private String filePath = "/storage/emulated/0/Download/Bluetooth/OTA_TEST1.bin";
+    private String filePath = null;
 
     private OTACallback otaCallback;
 
@@ -40,8 +41,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
     private boolean writeStatus = false;
 
 
-    private Object object = new Object();
-
+    private MyHandler myHandler = new MyHandler();
 
     public OTAImpl() {
         init(UUID_OTA_SEND_DATA);
@@ -63,6 +63,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
                 public void run() {
                     try {
                         doSendFileByBluetooth(filePath);
+                        myHandler.sendEmptyMessage(1);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (BleUUIDNullException e) {
@@ -172,7 +173,6 @@ class OTAImpl extends AbsBleManager implements BleCfg {
 
     public void doSendFileByBluetooth(String filePath)
             throws FileNotFoundException, BleUUIDNullException {
-        long startTime = System.currentTimeMillis();
         if (!filePath.equals(null)) {
             int read_count;
             int i = 0;
@@ -192,8 +192,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
             send_offset = (int) (leng % send_each_count);
             input = new BufferedInputStream(isfile);
             setRecv_data(0);
-            ycBleLog.e("========1");
-            send_data(FRKUtils.OTA_CMD_GET_STR_BASE, 0, null, 0);
+            send_data(FreqchipUtils.OTA_CMD_GET_STR_BASE, 0, null, 0);
 
             while (getRecv_data() != 1) {
                 if (checkDisconnect()) {
@@ -201,18 +200,15 @@ class OTAImpl extends AbsBleManager implements BleCfg {
                 }
             }
 
-            if (FRKUtils.bytetoint(baseaddr) == firstaddr) {
+            if (FreqchipUtils.bytetoint(baseaddr) == firstaddr) {
                 addr = sencondaddr;
             } else {
                 addr = firstaddr;
             }
             setRecv_data(0);
-            ycBleLog.e("========2");
-
             page_erase(addr, leng);
             try {
                 while (((read_count = input.read(inputBuffer, 0, packageSize)) != -1)) {
-                    ycBleLog.e("========while");
                     send_data(OTA_CMD_WRITE_DATA, addr, inputBuffer, read_count);
                     //for(delay_num = 0;delay_num < 10000;delay_num++);
                     addr += read_count;
@@ -222,7 +218,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
                     i++;
                     writePrecent = (int) (((float) send_data_count / leng) * 100);
                     //进度
-//                    mHandler.sendEmptyMessage(1);
+                    myHandler.sendEmptyMessage(1);
                     while (!writeStatus) ;
                     writeStatus = false;
                     while (getRecv_data() != 1) {
@@ -232,16 +228,13 @@ class OTAImpl extends AbsBleManager implements BleCfg {
                     }
                     setRecv_data(0);
                 }
-                ycBleLog.e("========3");
-                while (FRKUtils.bytetoint(baseaddr) != (addr - lastReadCount)) {
+                while (FreqchipUtils.bytetoint(baseaddr) != (addr - lastReadCount)) {
                     if (checkDisconnect()) {
                         return;
                     }
                 }
-                ycBleLog.e("========4");
-                send_data(FRKUtils.OTA_CMD_REBOOT, 0, null, 0);
-//                mHandler.sendEmptyMessage(0);
-                Log.e("花费时间:", (System.currentTimeMillis() - startTime) + "");
+                send_data(FreqchipUtils.OTA_CMD_REBOOT, 0, null, 0);
+                myHandler.sendEmptyMessage(0);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -255,14 +248,14 @@ class OTAImpl extends AbsBleManager implements BleCfg {
         byte[] cmd_write = null;
         byte[] result_cmd = null;
         byte[] cmd = new byte[1];
-        cmd_write = FRKUtils.cmd_operation(type, length, addr);
-        if ((type == FRKUtils.OTA_CMD_GET_STR_BASE) || ((type == FRKUtils.OTA_CMD_PAGE_ERASE))) {
+        cmd_write = FreqchipUtils.cmd_operation(type, length, addr);
+        if ((type == FreqchipUtils.OTA_CMD_GET_STR_BASE) || ((type == FreqchipUtils.OTA_CMD_PAGE_ERASE))) {
             result_cmd = cmd_write;
-        } else if (type == FRKUtils.OTA_CMD_REBOOT) {
+        } else if (type == FreqchipUtils.OTA_CMD_REBOOT) {
             cmd[0] = (byte) (type & 0xff);
             result_cmd = cmd;
         } else {
-            result_cmd = FRKUtils.byteMerger(cmd_write, buffer);
+            result_cmd = FreqchipUtils.byteMerger(cmd_write, buffer);
         }
         return writeDataWithoutResp(UUID_OTA_SERVICE, UUID_OTA_SEND_DATA, result_cmd);
 
@@ -284,7 +277,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
             count++;
         }
         for (int i = 0; i < count; i++) {
-            send_data(FRKUtils.OTA_CMD_PAGE_ERASE, addr, null, 0);
+            send_data(FreqchipUtils.OTA_CMD_PAGE_ERASE, addr, null, 0);
             while (getRecv_data() != 1) ;
             setRecv_data(0);
             addr += 0x1000;
@@ -294,67 +287,35 @@ class OTAImpl extends AbsBleManager implements BleCfg {
 
     boolean checkDisconnect() {
         if (!isConn()) {
+            myHandler.sendEmptyMessage(2);
             return true;
         }
         return false;
     }
 
-    /**
-     * 开始OTA 指令
-     */
-    private void startOTACmd() {
-//        send_data(FRKUtils.OTA_CMD_GET_STR_BASE, 0, null, 0);
-    }
 
-    /**
-     * 发送OTA 数据
-     */
-    private void sendOTAData() {
-
-
-    }
-
-    /**
-     * 结束OTA 重启设备
-     */
-    private void endOTACmd() {
-
-    }
-
-    /**
-     * 等待
-     */
-    void waitObj() {
-        synchronized (object) {
-            try {
-                object.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private class MyHandler extends Handler {
+        @Override
+        public void dispatchMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    if (otaCallback != null) {
+                        otaCallback.onSuccess();
+                    }
+                    break;
+                case 1:
+                    if (otaCallback != null) {
+                        otaCallback.onProgress(writePrecent);
+                    }
+                    break;
+                case 2:
+                    if (otaCallback != null) {
+                        otaCallback.onFailure(OTAErrCode.LOST_CONN, "disconnected");
+                    }
+                    break;
+                default:
+                    break;
             }
-        }
-    }
-
-    /**
-     * 等待
-     *
-     * @param time
-     */
-    void waitObj(int time) {
-        synchronized (object) {
-            try {
-                object.wait(time);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 唤醒
-     */
-    void notifyObj() {
-        synchronized (object) {
-            object.notify();
         }
     }
 

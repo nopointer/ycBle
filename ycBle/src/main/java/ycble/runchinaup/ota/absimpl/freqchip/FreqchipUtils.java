@@ -1,6 +1,6 @@
-package ycble.runchinaup.ota.absimpl.fuwokun;
+package ycble.runchinaup.ota.absimpl.freqchip;
 
-class FRKUtils {
+class FreqchipUtils {
 
     public final static int OTA_CMD_GET_STR_BASE = 1;
     public final static int OTA_CMD_PAGE_ERASE = 3;

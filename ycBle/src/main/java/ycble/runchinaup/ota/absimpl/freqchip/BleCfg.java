@@ -1,4 +1,4 @@
-package ycble.runchinaup.ota.absimpl.fuwokun;
+package ycble.runchinaup.ota.absimpl.freqchip;
 
 import java.util.UUID;
 

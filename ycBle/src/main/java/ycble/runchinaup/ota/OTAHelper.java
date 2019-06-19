@@ -5,7 +5,7 @@ import android.content.Context;
 import no.nordicsemi.android.dfu.DfuBaseService;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
-import ycble.runchinaup.ota.absimpl.fuwokun.FWKOTAHelper;
+import ycble.runchinaup.ota.absimpl.freqchip.FreqchipOTAHelper;
 import ycble.runchinaup.ota.absimpl.htx.HTXOTAHelper;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
 import ycble.runchinaup.ota.absimpl.telink.TeLinkOTAHelper;
@@ -62,7 +62,7 @@ public class OTAHelper {
                 TeLinkOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
             case FURUIKUN:
-                FWKOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
+                FreqchipOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
         }
     }

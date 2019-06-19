@@ -1,4 +1,4 @@
-package ycble.runchinaup.ota.absimpl.fuwokun;
+package ycble.runchinaup.ota.absimpl.freqchip;
 
 import android.content.Context;
 
@@ -8,14 +8,14 @@ import ycble.runchinaup.ota.callback.OTACallback;
 /**
  * 富窝坤OTA
  */
-public class FWKOTAHelper {
-    private static final FWKOTAHelper ourInstance = new FWKOTAHelper();
+public class FreqchipOTAHelper {
+    private static final FreqchipOTAHelper ourInstance = new FreqchipOTAHelper();
 
-    public static FWKOTAHelper getInstance() {
+    public static FreqchipOTAHelper getInstance() {
         return ourInstance;
     }
 
-    private FWKOTAHelper() {
+    private FreqchipOTAHelper() {
     }
 
     private OTAImpl otaImpl = new OTAImpl();
