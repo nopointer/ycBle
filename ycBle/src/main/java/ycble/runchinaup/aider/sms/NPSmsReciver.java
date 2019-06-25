@@ -100,7 +100,7 @@ public class NPSmsReciver extends BroadcastReceiver {
      * 清空上一次的短信内容
      */
     public static void clearLastMessage() {
-        if (strLastContent != null && TextUtils.isEmpty(strLastContent)) {
+        if (strLastContent != null && !TextUtils.isEmpty(strLastContent)) {
             strLastContent = null;
         }
     }
