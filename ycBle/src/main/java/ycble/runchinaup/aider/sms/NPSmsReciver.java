@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import ycble.runchinaup.aider.MsgNotifyHelper;
 import ycble.runchinaup.aider.phone.NPContactsUtil;
 import ycble.runchinaup.log.ycBleLog;
@@ -49,31 +51,28 @@ public class NPSmsReciver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         ycBleLog.e("debug sms" + "短信来了===>");
         Bundle bundle = intent.getExtras();
-        SmsMessage msg = null;
         String number = null;
         StringBuilder messageContentBuilder = new StringBuilder();
         if (null != bundle) {
             Object[] smsObj = (Object[]) bundle.get("pdus");
             if (null != smsObj) {
                 for (Object object : smsObj) {
-                    msg = SmsMessage.createFromPdu((byte[]) object);
+                    SmsMessage msg = SmsMessage.createFromPdu((byte[]) object);
                     if (null != msg) {
                         number = msg.getOriginatingAddress();
                         String messageContent = msg.getDisplayMessageBody();
-                        if (null == number || null == messageContent || TextUtils.isEmpty(number) || TextUtils.isEmpty(messageContent)) {
-                            return;
+                        ycBleLog.e("短信:" + new Gson().toJson(new String[]{number, messageContent}));
+                        if (!TextUtils.isEmpty(messageContent)) {
+                            messageContentBuilder.append(messageContent);
                         }
-                        messageContentBuilder.append(messageContent);
                     }
                 }
                 if (TextUtils.isEmpty(messageContentBuilder.toString())) {
                     messageContentBuilder.append(messageWithNoPermissionText);
                 }
 
-                if (TextUtils.isEmpty(strLastContent) || !strLastContent.equals(messageContentBuilder.toString())) {
-                    MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.queryContact(context, number), messageContentBuilder.toString());
-                    strLastContent = messageContentBuilder.toString();
-                }
+                MsgNotifyHelper.getMsgNotifyHelper().onMessageReceive(number, NPContactsUtil.queryContact(context, number), messageContentBuilder.toString());
+                strLastContent = messageContentBuilder.toString();
             }
         }
     }
@@ -99,10 +98,9 @@ public class NPSmsReciver extends BroadcastReceiver {
     /**
      * 清空上一次的短信内容
      */
+    @Deprecated
     public static void clearLastMessage() {
-        if (strLastContent != null && !TextUtils.isEmpty(strLastContent)) {
-            strLastContent = null;
-        }
+        strLastContent = null;
     }
 
 

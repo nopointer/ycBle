@@ -127,6 +127,7 @@ public class NPAccessibilityService extends AccessibilityService {
     /**
      * 清空上一次的消息内容
      */
+    @Deprecated
     public static void clearLastMessage() {
         if (lastMsgStr != null && !TextUtils.isEmpty(lastMsgStr)) {
             lastMsgStr = null;
