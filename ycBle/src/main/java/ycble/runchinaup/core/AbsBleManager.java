@@ -154,33 +154,8 @@ public abstract class AbsBleManager implements ConnScanListener {
      * @param timeOutSecond 扫描超时时间 单位秒，0 表示一直扫描
      */
     public void scanAndConn(final String mac, int timeOutSecond) {
-        if (!isBLeEnabled()) {
-            ycBleLog.e("蓝牙没有打开呢！");
-            return;
-        }
-        if (isConn) {
-            ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
-            myBleScaner.stopScanForConn();
-            return;
-        }
-        if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
-            ycBleLog.e("mac地址都不对,地址要注意大写,且不能为空！！！！！");
-            return;
-        }
 
-        if (isConnectIng) {
-            ycBleLog.e("ble-当前已经发出了连接请求，还没响应，不需要再发送这次请求");
-            withBleConnState(BleConnState.CONNECTING);
-            return;
-        }
-
-        if (!TextUtils.isEmpty(connMac) && !mac.equals(connMac)) {
-            ycBleLog.e("连接新的设备之前，需先调用断开指令");
-            return;
-        }
-
-        if (isOTAMode) {
-            ycBleLog.e("醒醒吧 现在是在OTA模式下");
+        if (!verifyConnBefore(mac)) {
             return;
         }
 
@@ -204,9 +179,28 @@ public abstract class AbsBleManager implements ConnScanListener {
         handler.sendEmptyMessageDelayed(MSG_AFTER_SCAN_TIMEOUT, timeOutSecond * 1000);
     }
 
-    //连接设备
+
+    /**
+     * 直接连接设备
+     *
+     * @param mac
+     */
     public void connDevice(final String mac) {
-        privateConnnect(mac);
+        if (!verifyConnBefore(mac)) {
+            return;
+        }
+        connMac = mac;
+        ycBleLog.reCreateLogFile(mac);
+        BleStateReceiver.getInstance().setListenerMac(connMac);
+        BluetoothDevice bluetoothDevice = AbsBleConnManger.isInConnList(mac, mContext);
+        ycBleLog.e("debug===先判断 当前蓝牙设备是不是在其他的app中连接了");
+        if (bluetoothDevice != null) {
+            ycBleLog.e("debug===还真被其他应用连接了,那就简单了,直接去拿连接过来就是了");
+            connWithSysConn(bluetoothDevice);
+            return;
+        } else {
+            privateConnnect(mac);
+        }
     }
 
     //连接系统连接中的设备
@@ -809,6 +803,45 @@ public abstract class AbsBleManager implements ConnScanListener {
             }
         }
     };
+
+    /**
+     * 验证是否可以连接
+     *
+     * @return
+     */
+    private boolean verifyConnBefore(String mac) {
+        if (!isBLeEnabled()) {
+            ycBleLog.e("蓝牙没有打开呢！");
+            return false;
+        }
+        if (isConn) {
+            ycBleLog.e("已经是连接的，，不需要花里胡哨的了");
+            myBleScaner.stopScanForConn();
+            return false;
+        }
+        if (TextUtils.isEmpty(mac) || !mac.matches(strMacRule)) {
+            ycBleLog.e("mac地址都不对,地址要注意大写,且不能为空！！！！！");
+            return false;
+        }
+
+        if (isConnectIng) {
+            ycBleLog.e("ble-当前已经发出了连接请求，还没响应，不需要再发送这次请求");
+            withBleConnState(BleConnState.CONNECTING);
+            return false;
+        }
+
+        if (!TextUtils.isEmpty(connMac) && !mac.equals(connMac)) {
+            ycBleLog.e("连接新的设备之前，需先调用断开指令");
+            return false;
+        }
+
+        if (isOTAMode) {
+            ycBleLog.e("醒醒吧 现在是在OTA模式下");
+            return false;
+        }
+        return true;
+    }
+
 
     //=======================================================================
     //=======================================================================
