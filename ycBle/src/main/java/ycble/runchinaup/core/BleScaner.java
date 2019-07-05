@@ -6,13 +6,16 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -243,7 +246,7 @@ public class BleScaner {
         }
     }
 
-    private void onFailure(int code){
+    private void onFailure(int code) {
         for (ScanListener scanListener : scanListenerHashSet) {
             scanListener.onFailure(code);
         }
@@ -297,7 +300,8 @@ public class BleScaner {
             if (Build.VERSION.SDK_INT < 21) {
                 adapter.startLeScan(scanCallback43);
             } else {
-                bluetoothLeScanner.startScan(null, scanSettings, scanCallback50);
+                List<ScanFilter> filters = Collections.singletonList(new ScanFilter.Builder().build());
+                bluetoothLeScanner.startScan(filters, scanSettings, scanCallback50);
             }
         } else {
             if (Build.VERSION.SDK_INT < 21) {
