@@ -1,8 +1,6 @@
 package ycble.runchinaup.aider;
 
 import android.content.Context;
-import android.database.ContentObserver;
-import android.os.Handler;
 
 import ycble.runchinaup.aider.callback.MsgCallback;
 import ycble.runchinaup.aider.phone.NPPhoneStateReceiver;
@@ -100,16 +98,4 @@ public final class PushAiderHelper {
             e.printStackTrace();
         }
     }
-
-
-    //手机短信状态观察者，暂时不用，国内的贱商搞得收不到通知类的短信了，暂时没得玩
-    @Deprecated
-    private static ContentObserver smsObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-//            ycBleLog.e("短信数据库有变化");
-//            NPSmsUtil.reLoadSms(mContext,smsPath1);
-        }
-    };
 }

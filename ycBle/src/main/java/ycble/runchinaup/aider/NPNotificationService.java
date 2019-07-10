@@ -33,9 +33,7 @@ public final class NPNotificationService extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(1, new Notification()); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
-        }
+        startForegroundFuckAndroidP();
     }
 
     @Override
@@ -48,10 +46,7 @@ public final class NPNotificationService extends NotificationListenerService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ycBleLog.e("通知栏onStartCommand");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(1, new Notification()); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
-        }
-        NotificationMsgUtil.reBindService(this);
+        startForegroundFuckAndroidP();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -111,5 +106,13 @@ public final class NPNotificationService extends NotificationListenerService {
             lastMsgStr = null;
         }
     }
+
+    /**
+     * fuck的 google 9.0各种坑逼问题
+     */
+    private void startForegroundFuckAndroidP() {
+        NotificationMsgUtil.reBindService(this);
+    }
+
 
 }
