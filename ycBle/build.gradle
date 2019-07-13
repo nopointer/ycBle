@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 81
-        versionName "beta_0.0.81"
+        versionCode 82
+        versionName "beta_0.0.82"
     }
 
     buildTypes {
@@ -40,6 +40,5 @@ dependencies {
     implementation 'no.nordicsemi.android:dfu:1.7.0'
     api fileTree(include: '*.jar', dir: 'libs')
     api(name: 'htx_ota_lib', ext: 'aar')
-
-    implementation 'no.nordicsemi.android.support.v18:scanner:1.4.0'
+    api 'no.nordicsemi.android.support.v18:scanner:1.4.0'
 }
