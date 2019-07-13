@@ -37,13 +37,12 @@ public abstract class AbsBleManager implements ConnScanListener {
     //蓝牙抽象的管理器
 
     //蓝牙扫描器
-    public BleScaner myBleScaner = BleScaner.getBleScaner();
+    public BleScanner myBleScaner = BleScanner.getInstance();
 
     private AbsBleConnManger absBleConnManger = null;
 
     protected static void initSDK(Context context) {
         mContext = context;
-        BleScaner.initSDK(context);
     }
 
     //初始化

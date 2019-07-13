@@ -1,29 +1,24 @@
 package ycble.runchinaup.core;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
-import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import androidx.annotation.NonNull;
+import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
+import no.nordicsemi.android.support.v18.scanner.ScanCallback;
+import no.nordicsemi.android.support.v18.scanner.ScanFilter;
+import no.nordicsemi.android.support.v18.scanner.ScanResult;
+import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 import ycble.runchinaup.core.callback.ScanListener;
 import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.log.ycBleLog;
 
-import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY;
 import static ycble.runchinaup.BleCfg.npBleTag;
 
 /**
@@ -31,19 +26,18 @@ import static ycble.runchinaup.BleCfg.npBleTag;
  * 蓝牙扫描
  */
 
-public class BleScaner {
+public class BleScanner {
 
-    private static BleScaner bleScaner = new BleScaner();
+    private static BleScanner bleScanner = new BleScanner();
 
-    public static BleScaner getBleScaner() {
-        return bleScaner;
+    public static BleScanner getInstance() {
+        return bleScanner;
     }
-
 
     protected static boolean isShowScanLog = true;
 
     //线程池
-    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(10);
+    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(30);
 
     //========================================
     //  单例模板              =================
@@ -54,29 +48,14 @@ public class BleScaner {
     //是否是在做为了连接的扫描
     private boolean isScanForConn = false;
 
-    private BleScaner() {
+    private BleScanner() {
         init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-            if (bluetoothLeScanner == null) {
-                bluetoothLeScanner = adapter.getBluetoothLeScanner();
-            }
-            if (scanSettings == null) {
-                ScanSettings.Builder builder = new ScanSettings.Builder();
-                builder.setScanMode(SCAN_MODE_LOW_LATENCY);
-                scanSettings = builder.build();
-            }
-        }
     }
 
-    private static Context mContext = null;
     //蓝牙适配器
     private BluetoothAdapter adapter = null;
     //5.0以后的蓝牙扫描
-    private ScanCallback scanCallback50 = null;
-
-    //5.0以前的蓝牙扫描
-    private BluetoothAdapter.LeScanCallback scanCallback43 = null;
+    private ScanCallback scanCallback = null;
 
     //========================================
     //  扫描部分              =================
@@ -88,36 +67,33 @@ public class BleScaner {
         return adapter.isEnabled();
     }
 
-    //初始化蓝牙设备
-    public static void initSDK(Context context) {
-        mContext = context;
-    }
-
     private void init() {
-        if (mContext == null) {
-            adapter = BluetoothAdapter.getDefaultAdapter();
-        } else {
-            BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
-            if (bluetoothManager == null) {
-                adapter = BluetoothAdapter.getDefaultAdapter();
-            } else {
-                adapter = bluetoothManager.getAdapter();
-            }
-        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (scanCallback50 == null) {
-                scanCallback50 = new ScanCallback() {
-                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                    @Override
-                    public void onScanResult(int callbackType, final ScanResult result) {
-                        super.onScanResult(callbackType, result);
+        if (adapter == null) {
+            adapter = BluetoothAdapter.getDefaultAdapter();
+        }
+        
+        if (scanCallback == null) {
+            scanCallback = new ScanCallback() {
+
+                //单个,在扫描的时候已经配置过了从批量里面去拿结果，暂时不需要单个扫描的结果了
+//                    @Override
+//                    public void onScanResult(int callbackType, final ScanResult result) {
+//                        super.onScanResult(callbackType, result);
+//                        ycBleLog.e("====onScanResult====>单个==>" );
+//                    }
+
+                @Override
+                public void onBatchScanResults(@NonNull List<ScanResult> results) {
+                    super.onBatchScanResults(results);
+                    ycBleLog.i("====onScanResult====>批量==>" + results.size());
+                    for (final ScanResult result : results) {
                         cachedThreadPool.execute(new Runnable() {
                             @Override
                             public void run() {
                                 BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                                 if (isShowScanLog) {
-                                    ycBleLog.e("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
+                                    ycBleLog.i("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
                                 }
                                 if (isScanForNormal) {
                                     if (bleDeviceFilter != null) {
@@ -135,66 +111,23 @@ public class BleScaner {
                             }
                         });
                     }
+                }
 
-                    @Override
-                    public void onScanFailed(int errorCode) {
-                        super.onScanFailed(errorCode);
-                        ycBleLog.e("onScanFailed====>" + errorCode);
-                        onFailure(errorCode);
-//                        try {
-//                            bluetoothLeScanner.stopScan(scanCallback50);
-//                            bluetoothLeScanner.startScan(null, scanSettings, scanCallback50);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        } finally {
-//
-//                        }
-                    }
-                };
-            }
-            if (adapter == null) {
-                adapter = BluetoothAdapter.getDefaultAdapter();
-            }
-            if (bluetoothLeScanner == null) {
-                bluetoothLeScanner = adapter.getBluetoothLeScanner();
-            }
-        }
-        if (scanCallback43 == null) {
-            scanCallback43 = new BluetoothAdapter.LeScanCallback() {
                 @Override
-                public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-                    cachedThreadPool.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            BleDevice bleDevice = BleDevice.parserFromScanData(device, scanRecord, rssi);
-                            //如果是常规的扫描正在进行的话
-                            if (isScanForNormal) {
-                                if (bleDeviceFilter != null) {
-                                    if (bleDeviceFilter.filter(bleDevice)) {
-                                        onScan(bleDevice);
-                                    }
-                                } else {
-                                    onScan(bleDevice);
-                                }
-                            }
-                            //如果用户需要管理的设备 还在的话,是要回调回去的
-                            if (!TextUtils.isEmpty(scanForMyDeviceMac) && bleDevice.getMac().equals(scanForMyDeviceMac) && connScanListener != null) {
-                                connScanListener.scanMyDevice(bleDevice);
-                            }
-                        }
-                    });
+                public void onScanFailed(int errorCode) {
+                    super.onScanFailed(errorCode);
+                    ycBleLog.e("onScanFailed====>" + errorCode);
+                    onFailure(errorCode);
                 }
             };
         }
+       
     }
-
-    BluetoothLeScanner bluetoothLeScanner = null;
-    ScanSettings scanSettings = null;
 
     public void startScan() {
         init();
         if (!isEnabled()) {
-            ycBleLog.w(npBleTag + " 蓝牙没有打开--");
+            ycBleLog.e(npBleTag + "蓝牙没有打开，请先打开手机蓝牙，再进行扫描");
             return;
         }
         ycBleLog.e("要求开始扫描设备,当前扫描状态:" + isScan);
@@ -297,18 +230,15 @@ public class BleScaner {
 
         isScan = isScanForConn || isScanForNormal;
         if (isScan) {
-            if (Build.VERSION.SDK_INT < 21) {
-                adapter.startLeScan(scanCallback43);
-            } else {
-                List<ScanFilter> filters = Collections.singletonList(new ScanFilter.Builder().build());
-                bluetoothLeScanner.startScan(filters, scanSettings, scanCallback50);
-            }
+            final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+
+            final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1500).setUseHardwareBatchingIfSupported(false).build();
+            final List<ScanFilter> filters = new ArrayList<>();
+            filters.add(new ScanFilter.Builder().build());
+            scanner.startScan(filters, settings, scanCallback);
         } else {
-            if (Build.VERSION.SDK_INT < 21) {
-                adapter.stopLeScan(scanCallback43);
-            } else {
-                bluetoothLeScanner.stopScan(scanCallback50);
-            }
+            final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+            scanner.stopScan(scanCallback);
         }
     }
 
