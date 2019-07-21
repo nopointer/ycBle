@@ -20,6 +20,8 @@ class ReStartNotificationReceiver extends BroadcastReceiver {
         boolean result = NotificationMsgUtil.isServiceExisted(context, NPNotificationService.class);
         if (!result){
             ycBleLog.e("通知没有打开");
+            PushAiderHelper.getAiderHelper().start(context);
+            NotificationMsgUtil.reBindService(context);
         }
     }
 

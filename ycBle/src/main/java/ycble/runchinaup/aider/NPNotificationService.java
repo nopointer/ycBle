@@ -57,14 +57,22 @@ public final class NPNotificationService extends NotificationListenerService {
         super.onNotificationPosted(sbn);
         NPNotificationServiceCanReceive = true;
         if (sbn == null) return;
-        Bundle extras = sbn.getNotification().extras;
-        if (extras == null) return;
-        String notificationTitle = extras.getString(Notification.EXTRA_TITLE);
-        if (TextUtils.isEmpty(notificationTitle)) return;
         //应用包名
         String pckName = sbn.getPackageName();
-        //消息发送方
-        String from = notificationTitle;
+        if (TextUtils.isEmpty(pckName)) {
+            return;
+        }
+        Bundle extras = sbn.getNotification().extras;
+        if (extras == null) return;
+
+        //消息发送方,QQ 来电或者语音是没有发送方的，为空
+        String from = "";
+
+        String notificationTitle = extras.getString(Notification.EXTRA_TITLE);
+        if (!TextUtils.isEmpty(notificationTitle)) {
+            from = notificationTitle;
+        }
+
         //消息内容
         String msgStr;
         try {
@@ -72,7 +80,6 @@ public final class NPNotificationService extends NotificationListenerService {
         } catch (NullPointerException e) {
             msgStr = "";
         }
-        if (TextUtils.isEmpty(from) || TextUtils.isEmpty(msgStr)) return;
 
         ycBleLog.e("通知栏获取到消息==>{" + msgStr + "}===>pckName:" + pckName);
 
@@ -85,6 +92,11 @@ public final class NPNotificationService extends NotificationListenerService {
         super.onNotificationRemoved(sbn);
     }
 
+//    @Override
+//    public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
+//        super.onNotificationPosted(sbn, rankingMap);
+//        ycBleLog.e("onNotificationPosted(StatusBarNotification sbn,RankingMap rankingMap)");
+//    }
 
     //处理消息，判断消息类型和来源
     public void handMsg(String pkhName, String from, String msgContent) {

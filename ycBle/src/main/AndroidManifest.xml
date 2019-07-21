@@ -2,7 +2,6 @@
     package="ycble.runchinaup">
 
 
-
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
@@ -30,4 +29,6 @@
             android:enabled="true"
             android:exported="true" />
     </application>
+
+
 </manifest>
