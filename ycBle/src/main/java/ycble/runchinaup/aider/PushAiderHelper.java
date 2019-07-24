@@ -1,6 +1,7 @@
 package ycble.runchinaup.aider;
 
 import android.content.Context;
+import android.content.Intent;
 
 import ycble.runchinaup.aider.callback.MsgCallback;
 import ycble.runchinaup.aider.phone.NPPhoneStateReceiver;
@@ -17,11 +18,12 @@ public final class PushAiderHelper {
     private MsgNotifyHelper notifyHelper = MsgNotifyHelper.getMsgNotifyHelper();
 
 
-
     public void start(Context context) {
         try {
             //常用的系统广播
             context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
+            Intent intent = new Intent(context, NPNotificationService.class);
+            context.startService(intent);
             NotificationMsgUtil.reBindService(context);
             registerReceiver(context);
         } catch (Exception e) {
@@ -32,6 +34,8 @@ public final class PushAiderHelper {
     public void stop(Context context) {
         try {
             context.unregisterReceiver(npLiveReceiver);
+            Intent intent = new Intent(context, NPNotificationService.class);
+            context.stopService(intent);
             NotificationMsgUtil.closeService(context);
             unregisterReceiver(context);
         } catch (Exception e) {

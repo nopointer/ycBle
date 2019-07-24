@@ -77,11 +77,11 @@ public class BleScanner {
             scanCallback = new ScanCallback() {
 
                 //单个,在扫描的时候已经配置过了从批量里面去拿结果，暂时不需要单个扫描的结果了
-//                    @Override
-//                    public void onScanResult(int callbackType, final ScanResult result) {
-//                        super.onScanResult(callbackType, result);
-//                        ycBleLog.e("====onScanResult====>单个==>" );
-//                    }
+                    @Override
+                    public void onScanResult(int callbackType, final ScanResult result) {
+                        super.onScanResult(callbackType, result);
+                        ycBleLog.e("====onScanResult====>单个==>"+result.toString());
+                    }
 
                 @Override
                 public void onBatchScanResults(@NonNull List<ScanResult> results) {
