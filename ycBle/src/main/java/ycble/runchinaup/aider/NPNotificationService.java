@@ -102,6 +102,24 @@ public final class NPNotificationService extends NotificationListenerService {
     public void handMsg(String pkhName, String from, String msgContent) {
         String tmpStr = pkhName + "/from:" + from + "/msgContent:" + msgContent;
         MsgType msgType = MsgType.pck2MsgType(pkhName);
+
+        if (msgType == MsgType.WECHAT) {
+            if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(msgContent) && msgContent.length() > 4) {
+                int startIndex = msgContent.indexOf(from);
+                if (startIndex != -1) {
+                    msgContent = msgContent.substring(startIndex + from.length() + 1);
+                }
+            }
+        } else if (msgType == MsgType.Instagram) {
+            if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(msgContent) && msgContent.length() > from.length()) {
+                int startIndex = msgContent.indexOf(from);
+                if (startIndex != -1) {
+                    msgContent = msgContent.substring(startIndex + from.length() + 1);
+                }
+            }
+        }
+
+
         ycBleLog.e(msgType + "/" + tmpStr);
 //        if (TextUtils.isEmpty(lastMsgStr) || !tmpStr.equals(lastMsgStr)) {
         MsgNotifyHelper.getMsgNotifyHelper().onAppMsgReceiver(pkhName, msgType, from, msgContent);

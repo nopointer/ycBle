@@ -232,7 +232,7 @@ public class BleScanner {
         if (isScan) {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
 
-            final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1500).setUseHardwareBatchingIfSupported(false).build();
+            final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1200).setUseHardwareBatchingIfSupported(false).build();
             final List<ScanFilter> filters = new ArrayList<>();
             filters.add(new ScanFilter.Builder().build());
             scanner.startScan(filters, settings, scanCallback);

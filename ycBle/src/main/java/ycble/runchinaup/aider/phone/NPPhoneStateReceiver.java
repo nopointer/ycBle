@@ -26,13 +26,19 @@ public final class NPPhoneStateReceiver extends BroadcastReceiver {
      */
     private static final String PHONE_STATE = "android.intent.action.PHONE_STATE";
 
+    /**
+     * 最后一次状态和来电号码，为了去除重复的数据
+     */
+    private String lastStateAndNumber = "";
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action.equalsIgnoreCase(PHONE_STATE)) {
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             String extraIncomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-            onCallStateChanged(context,state, extraIncomingNumber);
+            onCallStateChanged(context, state, extraIncomingNumber);
         } else if (action.equalsIgnoreCase(Intent.ACTION_NEW_OUTGOING_CALL)) {
             ycBleLog.e("NPPhoneStateListener==>拨打电话出去");
         }
@@ -47,20 +53,28 @@ public final class NPPhoneStateReceiver extends BroadcastReceiver {
 
 
     //来电状态监听
-    public void onCallStateChanged(Context context,String state, String incomingNumber) {
-        ycBleLog.e("state:" + state + ";incomingNumber:" + incomingNumber);
-        if (TextUtils.isEmpty(incomingNumber)) return;
-        String name = NPContactsUtil.queryContact(context, incomingNumber);
+    public void onCallStateChanged(Context context, String state, String incomingNumber) {
 
-        if (state.equalsIgnoreCase(EXTRA_STATE_RINGING)) {
-            ycBleLog.e("NPPhoneStateListener==>手机铃声响了，来电人:" + name);
-            MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 0);
-        } else if (state.equalsIgnoreCase(EXTRA_STATE_IDLE)) {
-            ycBleLog.e("NPPhoneStateListener==>非通话状态" + name);
-            MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 2);
-        } else if (state.equalsIgnoreCase(EXTRA_STATE_OFFHOOK)) {
-            ycBleLog.e("NPPhoneStateListener==>电话被接通了,可能是打出去的，也可能是接听的" + incomingNumber);
-            MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 1);
+        ycBleLog.e("state:" + state + ";incomingNumber:" + incomingNumber);
+        if (TextUtils.isEmpty(incomingNumber)) {
+            ycBleLog.e("来电号码为空，没有读取通话记录权限，不往下执行");
+            return;
+        }
+
+        String currentState = state + "/" + incomingNumber;
+        if (!currentState.equalsIgnoreCase(lastStateAndNumber)) {
+            lastStateAndNumber = currentState;
+            String name = NPContactsUtil.queryContact(context, incomingNumber);
+            if (state.equalsIgnoreCase(EXTRA_STATE_RINGING)) {
+                ycBleLog.e("NPPhoneStateListener==>手机铃声响了，来电人:" + name);
+                MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 0);
+            } else if (state.equalsIgnoreCase(EXTRA_STATE_IDLE)) {
+                ycBleLog.e("NPPhoneStateListener==>非通话状态" + name);
+                MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 2);
+            } else if (state.equalsIgnoreCase(EXTRA_STATE_OFFHOOK)) {
+                ycBleLog.e("NPPhoneStateListener==>电话被接通了,可能是打出去的，也可能是接听的" + incomingNumber);
+                MsgNotifyHelper.getMsgNotifyHelper().onPhoneCallIng(incomingNumber, name, 1);
+            }
         }
     }
 }
