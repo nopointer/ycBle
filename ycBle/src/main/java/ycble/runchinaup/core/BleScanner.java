@@ -72,16 +72,16 @@ public class BleScanner {
         if (adapter == null) {
             adapter = BluetoothAdapter.getDefaultAdapter();
         }
-        
+
         if (scanCallback == null) {
             scanCallback = new ScanCallback() {
 
                 //单个,在扫描的时候已经配置过了从批量里面去拿结果，暂时不需要单个扫描的结果了
-                    @Override
-                    public void onScanResult(int callbackType, final ScanResult result) {
-                        super.onScanResult(callbackType, result);
-                        ycBleLog.e("====onScanResult====>单个==>"+result.toString());
-                    }
+                @Override
+                public void onScanResult(int callbackType, final ScanResult result) {
+                    super.onScanResult(callbackType, result);
+                    ycBleLog.e("====onScanResult====>单个==>" + result.toString());
+                }
 
                 @Override
                 public void onBatchScanResults(@NonNull List<ScanResult> results) {
@@ -121,7 +121,7 @@ public class BleScanner {
                 }
             };
         }
-       
+
     }
 
     public void startScan() {
@@ -231,10 +231,12 @@ public class BleScanner {
         isScan = isScanForConn || isScanForNormal;
         if (isScan) {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
-
             final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1200).setUseHardwareBatchingIfSupported(false).build();
             final List<ScanFilter> filters = new ArrayList<>();
             filters.add(new ScanFilter.Builder().build());
+            if (isScanForConn && isScanForNormal) {
+                scanner.stopScan(scanCallback);
+            }
             scanner.startScan(filters, settings, scanCallback);
         } else {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
