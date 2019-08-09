@@ -8,26 +8,11 @@
     <application>
 
         <service
-            android:name=".aider.NPNotificationService"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService" />
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".aider.NPAccessibilityService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".ota.absimpl.htx.BluetoothLeService"
+            android:name="ycble.runchinaup.ota.absimpl.htx.BluetoothLeService"
             android:enabled="true"
             android:exported="true" />
+
+
     </application>
 
 
