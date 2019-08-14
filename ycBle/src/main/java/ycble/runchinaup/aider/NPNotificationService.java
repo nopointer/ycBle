@@ -33,6 +33,7 @@ public final class NPNotificationService extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
+        ycBleLog.e("NPNotificationService===>onCreate");
         startForegroundFuckAndroidP();
     }
 

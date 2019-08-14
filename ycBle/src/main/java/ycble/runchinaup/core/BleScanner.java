@@ -1,6 +1,10 @@
 package ycble.runchinaup.core;
 
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -9,7 +13,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
 import no.nordicsemi.android.support.v18.scanner.ScanFilter;
@@ -35,6 +38,13 @@ public class BleScanner {
     }
 
     protected static boolean isShowScanLog = true;
+
+
+    protected static Context mContext;
+
+    protected static void init(Context context) {
+        mContext = context;
+    }
 
     //线程池
     private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(30);
@@ -87,6 +97,9 @@ public class BleScanner {
                 public void onBatchScanResults(@NonNull List<ScanResult> results) {
                     super.onBatchScanResults(results);
                     ycBleLog.i("====onScanResult====>批量==>" + results.size());
+                    if (results != null && results.size() == 0) {
+//                        mContext.sendBroadcast(new Intent(Intent.ACTION_SCREEN_ON));
+                    }
                     for (final ScanResult result : results) {
                         cachedThreadPool.execute(new Runnable() {
                             @Override
@@ -231,17 +244,29 @@ public class BleScanner {
         isScan = isScanForConn || isScanForNormal;
         if (isScan) {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
-            final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1200).setUseHardwareBatchingIfSupported(false).build();
+            final ScanSettings settings = new ScanSettings.Builder()
+                    .setLegacy(false)
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                    .setReportDelay(1200)
+                    .setUseHardwareBatchingIfSupported(false).build();
             final List<ScanFilter> filters = new ArrayList<>();
             filters.add(new ScanFilter.Builder().build());
             if (isScanForConn && isScanForNormal) {
                 scanner.stopScan(scanCallback);
             }
-            scanner.startScan(filters, settings, scanCallback);
+//            scanner.startScan(filters, settings, scanCallback);
+
+
+            Intent intent = new Intent(mContext, MyReceiver.class);
+            intent.setAction("com.example.ACTION_FOUND");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            scanner.startScan(filters, settings, mContext, pendingIntent);
         } else {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
             scanner.stopScan(scanCallback);
         }
     }
+
 
 }

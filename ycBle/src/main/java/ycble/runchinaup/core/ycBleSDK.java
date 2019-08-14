@@ -16,10 +16,14 @@ public class ycBleSDK {
     }
 
 
+
     public static void initSDK(Context context, boolean enablePushAider) {
+        BleScanner.init(context);
         AbsBleManager.initSDK(context);
         if (enablePushAider) {
             PushAiderHelper.getAiderHelper().start(context);
+        }else {
+            PushAiderHelper.getAiderHelper().stop(context);
         }
     }
 

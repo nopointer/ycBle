@@ -6,7 +6,6 @@ import android.content.Intent;
 import ycble.runchinaup.aider.callback.MsgCallback;
 import ycble.runchinaup.aider.phone.NPPhoneStateReceiver;
 import ycble.runchinaup.aider.sms.NPSmsReciver;
-import ycble.runchinaup.log.ycBleLog;
 
 /**
  * Created by nopointer on 2018/7/26.
@@ -39,12 +38,11 @@ public final class PushAiderHelper {
             NotificationMsgUtil.closeService(context);
             unregisterReceiver(context);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
     private PushAiderHelper() {
-        ycBleLog.e("new PushAiderHelper()");
     }
 
 
