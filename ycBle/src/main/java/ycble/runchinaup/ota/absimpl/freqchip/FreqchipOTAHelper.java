@@ -23,6 +23,6 @@ public class FreqchipOTAHelper {
         otaImpl = new OTAImpl();
         otaImpl.setFilePath(filePath);
         otaImpl.setOtaCallback(otaCallback);
-        otaImpl.scanAndConn(mac, 30);
+        otaImpl.connDevice(mac);
     }
 }

@@ -152,7 +152,8 @@ public abstract class AbsBleManager implements ConnScanListener {
      * @param mac           过滤的mac地址
      * @param timeOutSecond 扫描超时时间 单位秒，0 表示一直扫描
      */
-    public void scanAndConn(final String mac, int timeOutSecond) {
+    @Deprecated
+    private void scanAndConn(final String mac, int timeOutSecond) {
 
         if (!verifyConnBefore(mac)) {
             return;

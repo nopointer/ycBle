@@ -1,9 +1,7 @@
 package ycble.runchinaup.core;
 
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -254,19 +252,12 @@ public class BleScanner {
             if (isScanForConn && isScanForNormal) {
                 scanner.stopScan(scanCallback);
             }
-//            scanner.startScan(filters, settings, scanCallback);
+            scanner.startScan(filters, settings, scanCallback);
 
-
-            Intent intent = new Intent(mContext, MyReceiver.class);
-            intent.setAction("com.example.ACTION_FOUND");
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            scanner.startScan(filters, settings, mContext, pendingIntent);
         } else {
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
             scanner.stopScan(scanCallback);
         }
     }
-
-
 }
+

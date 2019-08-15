@@ -13,9 +13,9 @@
             android:exported="true" />
 
 
-        <receiver android:name=".core.MyReceiver">
+        <receiver android:name=".core.BleScanner$ScannerReceiver">
             <intent-filter>
-                <action android:name="com.example.ACTION_FOUND" />
+                <action android:name="lib.ycble.device.ACTION_FOUND" />
             </intent-filter>
         </receiver>
     </application>

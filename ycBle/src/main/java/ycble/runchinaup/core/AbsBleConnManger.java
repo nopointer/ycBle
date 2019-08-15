@@ -90,7 +90,14 @@ public final class AbsBleConnManger {
         ycBleLog.e("实际连接设备名称是:" + bluetoothDevice.getName());
         boolIsInterceptConn = false;
         isHandDisConn = false;
-        bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+
+        if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equalsIgnoreCase(bluetoothDevice.getAddress())) {
+            ycBleLog.e("回连接");
+            bluetoothGatt.connect();
+        } else {
+            ycBleLog.e("重新创建一个连接");
+            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+        }
 //下面的花里胡哨的我也没有搞懂有什么卵用
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -264,16 +271,11 @@ public final class AbsBleConnManger {
                 }
 
                 if (hasConn) {
-                    close(bluetoothGatt);
+//                    close(bluetoothGatt);
+                    hasConn = false;
+                    //刷新缓存
+                    refreshCache(context, bluetoothGatt);
                 }
-                //刷新缓存
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshCache(context, bluetoothGatt);
-                    }
-                }, 500);
-                hasConn = false;
             }
         }
 
@@ -302,7 +304,6 @@ public final class AbsBleConnManger {
                     }
                 } else {
                     ycBleLog.e("uuid对不上，情况不对");
-                    refreshCache(context, gatt);
                     gatt.disconnect();
                 }
             } else {
@@ -460,6 +461,7 @@ public final class AbsBleConnManger {
 
     //关闭蓝牙
     private void close(BluetoothGatt gatt) {
+        ycBleLog.e("close Gatt");
         if (gatt != null) {
             gatt.close();
         }
