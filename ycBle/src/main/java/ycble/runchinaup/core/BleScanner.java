@@ -240,23 +240,27 @@ public class BleScanner {
         ycBleLog.e(" 当前扫描状态:==>isScanForConn:" + isScanForConn);
 
         isScan = isScanForConn || isScanForNormal;
-        if (isScan) {
-            final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
-            final ScanSettings settings = new ScanSettings.Builder()
-                    .setLegacy(false)
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                    .setReportDelay(1200)
-                    .setUseHardwareBatchingIfSupported(false).build();
-            final List<ScanFilter> filters = new ArrayList<>();
-            filters.add(new ScanFilter.Builder().build());
-            if (isScanForConn && isScanForNormal) {
+        try {
+            if (isScan) {
+                final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+                final ScanSettings settings = new ScanSettings.Builder()
+                        .setLegacy(false)
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .setReportDelay(1200)
+                        .setUseHardwareBatchingIfSupported(false).build();
+                final List<ScanFilter> filters = new ArrayList<>();
+                filters.add(new ScanFilter.Builder().build());
+                if (isScanForConn && isScanForNormal) {
+                    scanner.stopScan(scanCallback);
+                }
+                scanner.startScan(filters, settings, scanCallback);
+
+            } else {
+                final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
                 scanner.stopScan(scanCallback);
             }
-            scanner.startScan(filters, settings, scanCallback);
-
-        } else {
-            final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
-            scanner.stopScan(scanCallback);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
