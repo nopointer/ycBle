@@ -13,6 +13,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +73,7 @@ public final class AbsBleConnManger {
      *
      * @param mac
      */
-    public void connect(String mac) {
+    protected void connect(String mac) {
         if (TextUtils.isEmpty(mac)) return;
         ycBleLog.e("发起连接请求的mac:" + mac);
         initBleAdapter();
@@ -85,19 +86,34 @@ public final class AbsBleConnManger {
      *
      * @param bluetoothDevice
      */
-    public void connect(BluetoothDevice bluetoothDevice) {
-        ycBleLog.e("实际连接设备地址是:" + bluetoothDevice.getAddress());
-        ycBleLog.e("实际连接设备名称是:" + bluetoothDevice.getName());
+    protected synchronized void connect(BluetoothDevice bluetoothDevice) {
+        ycBleLog.e("当前实际连接设备地址是:" + bluetoothDevice.getAddress());
+        String name = bluetoothDevice.getName();
+        if (TextUtils.isEmpty(name)) {
+            ycBleLog.e("本地没有缓存上设备的名称");
+            BleScanner.getInstance().startScanForConn();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    BleScanner.getInstance().stopScanForConn();
+                }
+            }, 3000);
+        }
+        ycBleLog.e("当前实际连接设备名称是:" + bluetoothDevice.getName());
         boolIsInterceptConn = false;
         isHandDisConn = false;
 
-        if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equalsIgnoreCase(bluetoothDevice.getAddress())) {
-            ycBleLog.e("回连接");
-            bluetoothGatt.connect();
-        } else {
-            ycBleLog.e("重新创建一个连接");
-            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
-        }
+        bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+
+        int clientIf = getClientIf(bluetoothGatt);
+        ycBleLog.e("clientIf=====>" + clientIf);
+//        if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equalsIgnoreCase(bluetoothDevice.getAddress())) {
+//            ycBleLog.e("回连接");
+//            bluetoothGatt.connect();
+//        } else {
+//            ycBleLog.e("重新创建一个连接");
+//
+//        }
 //下面的花里胡哨的我也没有搞懂有什么卵用
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -182,7 +198,7 @@ public final class AbsBleConnManger {
         public void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
 
-            ycBleLog.e("===========================================");
+            ycBleLog.e("===========================================" + this);
             ycBleLog.e(status + ":" + newState);
             ycBleLog.e(PhoneBleExceptionCode.getPhoneCode(status));
             ycBleLog.e("===========================================");
@@ -239,6 +255,8 @@ public final class AbsBleConnManger {
                     }
                 }, 500);
             } else {
+                ycBleLog.e("没有连接的所有情况====>>>>>>>>");
+
                 //只要没有连接上，那么所有的情况，都视为连接失败，这里有区分
 //                boolean boolTmp = isHandDisConn;
                 isConnected = false;
@@ -269,9 +287,10 @@ public final class AbsBleConnManger {
                         absBleConnCallback.connResult(BleConnState.CONNEXCEPTION);
                     }
                 }
+//                bluetoothGatt.disconnect();
+//                close(bluetoothGatt);
 
                 if (hasConn) {
-//                    close(bluetoothGatt);
                     hasConn = false;
                     //刷新缓存
                     refreshCache(context, bluetoothGatt);
@@ -564,11 +583,9 @@ public final class AbsBleConnManger {
     }
 
     private AbsBleConnCallback absBleConnCallback = null;
-    private BleStateReceiver.BleStateListener bleStateListener = null;
 
     public void setAbsBleConnAndStateCallback(AbsBleConnCallback absBleConnCallback, BleStateReceiver.BleStateListener bleStateListener) {
         this.absBleConnCallback = absBleConnCallback;
-        this.bleStateListener = bleStateListener;
         bleStateReceiver.setBleStateListener(bleStateListener);
         bleStateReceiver.startListen(context);
     }
@@ -617,5 +634,21 @@ public final class AbsBleConnManger {
             }
         }
     };
+
+
+    public int getClientIf(BluetoothGatt bluetoothGatt) {
+        int result = 0;
+        Class<?> clazz = bluetoothGatt.getClass();
+        try {
+            Field field = clazz.getDeclaredField("mClientIf");
+            field.setAccessible(true);
+            result = (int) field.get(bluetoothGatt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            return result;
+        }
+    }
+
 
 }

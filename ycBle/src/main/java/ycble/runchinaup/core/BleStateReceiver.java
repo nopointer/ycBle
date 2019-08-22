@@ -15,7 +15,6 @@ import static android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED;
 import static android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED;
 import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateClosingBle;
 import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateConn;
-import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateDisConn;
 import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateOffBle;
 import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateOnBle;
 import static ycble.runchinaup.core.BleStateReceiver.SystemBluetoothState.StateOpeningBle;
@@ -66,7 +65,6 @@ public class BleStateReceiver extends BroadcastReceiver {
     private static IntentFilter createSateFilter() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-//        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
         intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         return intentFilter;
@@ -140,8 +138,8 @@ public class BleStateReceiver extends BroadcastReceiver {
                 break;
                 case ACTION_ACL_DISCONNECTED: //有设备断开了
                 {
-                    hasCover = true;
-                    onState(StateDisConn, device);
+//                    hasCover = true;
+//                    onState(StateDisConn, device);
                 }
                 break;
             }

@@ -47,6 +47,7 @@ public class DfuHelper {
             ycBleLog.e("dfuServiceImpl cant be null");
             return;
         }
+        starter.setForeground(false);
         starter.start(context, dfuServiceImpl);
         DfuServiceListenerHelper.registerProgressListener(context, mDfuProgressListener);
     }
