@@ -9,9 +9,14 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.text.TextUtils;
+
+import com.google.gson.Gson;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,6 +28,8 @@ import ycble.runchinaup.exception.BleUUIDNullException;
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.util.BleUtil;
 
+import static android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED;
+import static android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED;
 import static ycble.runchinaup.BleCfg.npBleTag;
 
 /**
@@ -33,8 +40,7 @@ public final class AbsBleConnManger {
 
     private BluetoothAdapter bluetoothAdapter = null;
     //蓝牙状态接收器
-    protected BleStateReceiver bleStateReceiver = BleStateReceiver.getInstance();
-
+    protected BleStateReceiver bleStateReceiver = new BleStateReceiver();
 
     private Context context;
     private BluetoothGatt bluetoothGatt;
@@ -44,6 +50,11 @@ public final class AbsBleConnManger {
         initBleAdapter();
     }
 
+
+    /**
+     * 开始连接的时间
+     */
+    private long startConnTime = 0;
 
     private void initBleAdapter() {
         if (context == null) {
@@ -86,44 +97,15 @@ public final class AbsBleConnManger {
      *
      * @param bluetoothDevice
      */
-    protected synchronized void connect(BluetoothDevice bluetoothDevice) {
-        ycBleLog.e("当前实际连接设备地址是:" + bluetoothDevice.getAddress());
-        String name = bluetoothDevice.getName();
-        if (TextUtils.isEmpty(name)) {
-            ycBleLog.e("本地没有缓存上设备的名称");
-            BleScanner.getInstance().startScanForConn();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    BleScanner.getInstance().stopScanForConn();
-                }
-            }, 3000);
-        }
-        ycBleLog.e("当前实际连接设备名称是:" + bluetoothDevice.getName());
+    protected synchronized void connect(final BluetoothDevice bluetoothDevice) {
+        ycBleLog.e("当前实际连接设备是:" + new Gson().toJson(new String[]{
+                bluetoothDevice.getAddress(), bluetoothDevice.getName()
+        }));
         boolIsInterceptConn = false;
         isHandDisConn = false;
-
+        bleStateReceiver.startListen(context, bluetoothDevice.getAddress());
+        startConnTime = System.currentTimeMillis();
         bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
-
-        int clientIf = getClientIf(bluetoothGatt);
-        ycBleLog.e("clientIf=====>" + clientIf);
-//        if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equalsIgnoreCase(bluetoothDevice.getAddress())) {
-//            ycBleLog.e("回连接");
-//            bluetoothGatt.connect();
-//        } else {
-//            ycBleLog.e("重新创建一个连接");
-//
-//        }
-//下面的花里胡哨的我也没有搞懂有什么卵用
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback, TRANSPORT_LE, PHY_LE_CODED_MASK);
-//            } else {
-//                bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback, TRANSPORT_LE);
-//            }
-//        } else {
-//            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
-//        }
     }
 
     private Handler handler = new Handler();
@@ -214,7 +196,9 @@ public final class AbsBleConnManger {
 
             //连接上了
             if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothGatt.STATE_CONNECTED) {
-                ycBleLog.e("================设备连接上了");
+
+                long useTime = (System.currentTimeMillis() - startConnTime) / 1000L;
+                ycBleLog.e("================设备连接上了，耗时:" + useTime + "S");
 
                 hasConn = true;
 
@@ -239,11 +223,12 @@ public final class AbsBleConnManger {
                 ycBleLog.e("先移除所有的关于一次连接的消息队列");
                 hasServicesDiscovered = false;
                 handler.removeCallbacksAndMessages(null);
+
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (isConnected && bluetoothGatt != null) {
-                            //300毫秒后，如果还连接上的，则开始扫描服务
+                            //500毫秒后，如果还连接上的，则开始扫描服务
                             ycBleLog.e("500毫秒后，如果还连接上的，则开始扫描服务");
                             boolean boolResult = bluetoothGatt.discoverServices();
                             ycBleLog.e("discoverServices结果:" + boolResult);
@@ -265,11 +250,11 @@ public final class AbsBleConnManger {
                 if (hasConn) {
                     //如果是断开之前有过连接，那么一定会走广播的
                     ycBleLog.e("如果是断开之前有过连接，那么一定会走广播的");
-                    BleStateReceiver.getInstance().setHasCover(false);
+                    bleStateReceiver.setHasCover(false);
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (!BleStateReceiver.getInstance().isHasCover()) {
+                            if (!bleStateReceiver.isHasCover()) {
                                 ycBleLog.e("没有走广播，只能强行走回调");
                                 if (absBleConnCallback != null) {
                                     absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);
@@ -287,21 +272,21 @@ public final class AbsBleConnManger {
                         absBleConnCallback.connResult(BleConnState.CONNEXCEPTION);
                     }
                 }
-//                bluetoothGatt.disconnect();
-//                close(bluetoothGatt);
+                bluetoothGatt.disconnect();
+                close(bluetoothGatt);
 
                 if (hasConn) {
                     hasConn = false;
-                    //刷新缓存
-                    refreshCache(context, bluetoothGatt);
                 }
+                //刷新缓存
+                refreshCache(context, bluetoothGatt);
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
-            ycBleLog.e("onServicesDiscovered==status=>" + status);
+            ycBleLog.e("onServicesDiscovered==status=>" + status + new Gson().toJson(mustUUIDList));
             int count = 0;
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
@@ -584,10 +569,8 @@ public final class AbsBleConnManger {
 
     private AbsBleConnCallback absBleConnCallback = null;
 
-    public void setAbsBleConnAndStateCallback(AbsBleConnCallback absBleConnCallback, BleStateReceiver.BleStateListener bleStateListener) {
+    public void setAbsBleConnAndStateCallback(AbsBleConnCallback absBleConnCallback) {
         this.absBleConnCallback = absBleConnCallback;
-        bleStateReceiver.setBleStateListener(bleStateListener);
-        bleStateReceiver.startListen(context);
     }
 
     public static abstract class AbsBleConnCallback {
@@ -629,6 +612,9 @@ public final class AbsBleConnManger {
             ycBleLog.e("1000毫秒后，如果还连接上的，检测服务有没有被扫描到");
             if (!hasServicesDiscovered) {
                 ycBleLog.e("服务没有被检测到");
+                if (bluetoothGatt != null) {
+                    bluetoothGatt.disconnect();
+                }
             } else {
                 handler.removeCallbacks(discoverServiceRunnable);
             }
@@ -650,5 +636,132 @@ public final class AbsBleConnManger {
         }
     }
 
+
+    public class BleStateReceiver extends BroadcastReceiver {
+
+        /**
+         * 这个广播当然也是不所有的设备都要去监听的，只监听指定的设备
+         */
+        private String listenerMac = null;
+
+        private BleStateReceiver() {
+        }
+
+        /**
+         * 部分手机断开后不会不会走回调广播,所以这里才会tm的出现这个标志位，
+         * 在gatt回调里面拿到断开的回调后，如果走广播的话为true,不走广播的话，为false,然后延时
+         * 1200毫秒后再强行认为是断开了的
+         */
+        private boolean hasCover = false;
+
+        public boolean isHasCover() {
+            return hasCover;
+        }
+
+        public void setHasCover(boolean hasCover) {
+            this.hasCover = hasCover;
+        }
+
+        /**
+         * 创建一个蓝牙状态的过滤器
+         *
+         * @return
+         */
+        private IntentFilter createSateFilter() {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+            intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+            intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+            return intentFilter;
+        }
+
+        /**
+         * 开始监听mac地址
+         *
+         * @param context
+         */
+        public void startListen(Context context, String listenerMac) {
+            ycBleLog.e("监听此设备相关的蓝牙广播==>" + listenerMac);
+            this.listenerMac = listenerMac;
+            try {
+                if (context != null) {
+                    context.registerReceiver(this, createSateFilter());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * 停止监听
+         *
+         * @param context
+         */
+        public void stopListen(Context context) {
+            try {
+                if (context != null) {
+                    context.unregisterReceiver(this);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        void onBleState(SystemBluetoothState systemBluetoothState, BluetoothDevice bluetoothDevice) {
+
+        }
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+
+
+            String action = intent.getAction();
+
+            ycBleLog.e("BleStateReceiver 广播的action:===>" + action);
+
+            if (action.equals(ACTION_STATE_CHANGED)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                switch (state) {
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        ycBleLog.e("蓝牙正在打开......");
+                        onBleState(SystemBluetoothState.StateOpeningBle, null);
+                        break;
+
+                    case BluetoothAdapter.STATE_ON:
+                        ycBleLog.e("手机蓝牙开启状态");
+                        onBleState(SystemBluetoothState.StateOnBle, null);
+                        break;
+
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        ycBleLog.e("蓝牙正在关闭......");
+                        onBleState(SystemBluetoothState.StateClosingBle, null);
+                        break;
+
+                    case BluetoothAdapter.STATE_OFF:
+                        ycBleLog.e("手机蓝牙关闭状态");
+                        onBleState(SystemBluetoothState.StateOffBle, null);
+                        break;
+                }
+            } else {
+
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device == null) {
+                    ycBleLog.e("设备为空，不需要往后执行......");
+                    return;
+                }
+
+                ycBleLog.e("相关的设备===>" + device.getName() + "/" + device.getAddress());
+
+                if (TextUtils.isEmpty(listenerMac) || !device.getAddress().equalsIgnoreCase(listenerMac)) {
+                    ycBleLog.e("监听设备为空或者不属于本项目的设备，不需要往后执行......");
+                    return;
+                }
+                if (action == ACTION_ACL_DISCONNECTED) {
+
+                }
+            }
+        }
+
+    }
 
 }
