@@ -279,18 +279,14 @@ public final class AbsBleConnManger {
                         @Override
                         public void run() {
                             if (absBleConnCallback != null) {
-                                if (BleScanner.getInstance().isEnabled()) {
-                                    absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);
-                                } else {
-                                    absBleConnCallback.connResult(BleConnState.HANDDISCONN);
-                                }
+                                absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);
                             }
                         }
                     }, 1500);
                 } else {
                     ycBleLog.e("如果是断开之前没有连接，很明显，异常连接");
                     if (absBleConnCallback != null) {
-                        absBleConnCallback.connResult(BleScanner.getInstance().isEnabled()?BleConnState.HANDDISCONN:BleConnState.CONNEXCEPTION);
+                        absBleConnCallback.connResult(BleConnState.CONNEXCEPTION);
                     }
                 }
                 bluetoothGatt.disconnect();
