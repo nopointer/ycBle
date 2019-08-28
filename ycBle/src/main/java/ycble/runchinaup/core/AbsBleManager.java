@@ -310,7 +310,9 @@ public abstract class AbsBleManager {
      * 系统的蓝牙打开
      */
     public void onBleOpen() {
-
+        if (absBleConnManger != null) {
+            absBleConnManger.setHadScanDeviceFlag(true);
+        }
     }
 
     /**
@@ -319,6 +321,9 @@ public abstract class AbsBleManager {
     public void onBleClose() {
         isConnectIng = false;
         BleScanner.getInstance().stopScan();
+        if (absBleConnManger != null) {
+            absBleConnManger.setHadScanDeviceFlag(false);
+        }
     }
 
 

@@ -107,9 +107,9 @@ public final class AbsBleConnManger {
             BleScanner.getInstance().registerScanListener(new ScanListener() {
                 @Override
                 public synchronized void onScan(BleDevice bleDevice) {
-                    if (!hadScanDeviceFlag) {
+                    if (hadScanDeviceFlag) {
                         if (bleDevice != null && !TextUtils.isEmpty(bleDevice.getMac()) && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
-                            hadScanDeviceFlag = true;
+                            hadScanDeviceFlag = false;
                             BleScanner.getInstance().stopScan();
                             ycBleLog.e("扫描到设备了，停止扫描，然后再连接");
                             handler.postDelayed(new Runnable() {
@@ -162,8 +162,14 @@ public final class AbsBleConnManger {
     //是否是扫描到了服务，国产的蓝牙ic，有时候检测不到
     private boolean hasServicesDiscovered = false;
 
-    private boolean hadScanDeviceFlag = false;
+    /**
+     * 扫描后的连接标志位
+     */
+    private boolean hadScanDeviceFlag = true;
 
+    public void setHadScanDeviceFlag(boolean hadScanDeviceFlag) {
+        this.hadScanDeviceFlag = hadScanDeviceFlag;
+    }
 
     //是否是手动断开的
     private boolean isHandDisConn = false;
@@ -450,7 +456,7 @@ public final class AbsBleConnManger {
 
     //读取数据
     public boolean readData(UUID serViceUUID, UUID charaUUID) throws BleUUIDNullException {
-        ycBleLog.e(npBleTag + "->read:" + serViceUUID.toString() + "/" + charaUUID.toString());
+        ycBleLog. i(npBleTag + "->read:" + serViceUUID.toString() + "/" + charaUUID.toString());
         BluetoothGattService service = getService(serViceUUID);
         BluetoothGattCharacteristic characteristic = getChara(service, charaUUID);
         return bluetoothGatt.readCharacteristic(characteristic);
@@ -496,7 +502,7 @@ public final class AbsBleConnManger {
         bluetoothGatt.setCharacteristicNotification(characteristic, enable);
         descriptor.setValue(data);
         boolean writeResult = bluetoothGatt.writeDescriptor(descriptor);
-        ycBleLog.e(npBleTag + "notify/indication:" + serViceUUID.toString() + "-->" + charaUUID.toString() + "-->" + descriptor + "-->" + writeResult + "{ " + BleUtil.byte2HexStr(data) + " }");
+        ycBleLog.i(npBleTag + "notify/indication:" + serViceUUID.toString() + "-->" + charaUUID.toString() + "-->" + descriptor + "-->" + writeResult + "{ " + BleUtil.byte2HexStr(data) + " }");
         return writeResult;
     }
 
