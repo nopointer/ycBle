@@ -104,11 +104,14 @@ public final class AbsBleConnManger {
             bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
         } else {
             ycBleLog.e("名称为空，需要开启一下扫描来缓存一下设备名称");
+            hadScanDeviceFlag = true;
             BleScanner.getInstance().registerScanListener(new ScanListener() {
                 @Override
-                public synchronized void onScan(BleDevice bleDevice) {
+                public void onScan(BleDevice bleDevice) {
+                    ycBleLog.i("hadScanDeviceFlag=====>" + hadScanDeviceFlag);
                     if (hadScanDeviceFlag) {
-                        if (bleDevice != null && !TextUtils.isEmpty(bleDevice.getMac()) && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
+                        if (bleDevice != null && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
+                            BleScanner.getInstance().unRegisterScanListener(this);
                             hadScanDeviceFlag = false;
                             BleScanner.getInstance().stopScan();
                             ycBleLog.e("扫描到设备了，停止扫描，然后再连接");
@@ -117,7 +120,7 @@ public final class AbsBleConnManger {
                                 public void run() {
                                     bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
                                 }
-                            }, 1200);
+                            }, 2000);
                         }
                     }
                 }
@@ -302,7 +305,7 @@ public final class AbsBleConnManger {
                     hasConn = false;
                 }
                 //刷新缓存
-                refreshCache(context, bluetoothGatt);
+//                refreshCache(context, bluetoothGatt);
             }
         }
 
@@ -456,7 +459,7 @@ public final class AbsBleConnManger {
 
     //读取数据
     public boolean readData(UUID serViceUUID, UUID charaUUID) throws BleUUIDNullException {
-        ycBleLog. i(npBleTag + "->read:" + serViceUUID.toString() + "/" + charaUUID.toString());
+        ycBleLog.i(npBleTag + "->read:" + serViceUUID.toString() + "/" + charaUUID.toString());
         BluetoothGattService service = getService(serViceUUID);
         BluetoothGattCharacteristic characteristic = getChara(service, charaUUID);
         return bluetoothGatt.readCharacteristic(characteristic);

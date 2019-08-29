@@ -43,12 +43,25 @@ public class BleScanner {
 
     protected static Context mContext;
 
+    /**
+     * 设置扫描间隔,单位毫秒
+     */
+    private int scanRefreshTime = 1500;
+
+    public int getScanRefreshTime() {
+        return scanRefreshTime;
+    }
+
+    public void setScanRefreshTime(int scanRefreshTime) {
+        this.scanRefreshTime = scanRefreshTime;
+    }
+
     protected static void init(Context context) {
         mContext = context;
     }
 
     //线程池
-    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(30);
+    private ExecutorService cachedThreadPool = Executors.newScheduledThreadPool(10);
 
     //========================================
     //  单例模板              =================
@@ -113,16 +126,13 @@ public class BleScanner {
                 }
 
                 @Override
-                public void onBatchScanResults(@NonNull List<ScanResult> results) {
+                public void onBatchScanResults(@NonNull final List<ScanResult> results) {
                     super.onBatchScanResults(results);
                     ycBleLog.i("====onScanResult====>批量==>" + results.size());
-                    if (results != null && results.size() == 0) {
-//                        mContext.sendBroadcast(new Intent(Intent.ACTION_SCREEN_ON));
-                    }
-                    for (final ScanResult result : results) {
-                        cachedThreadPool.execute(new Runnable() {
-                            @Override
-                            public void run() {
+                    cachedThreadPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (ScanResult result : results) {
                                 BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                                 if (isShowScanLog) {
                                     ycBleLog.i("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
@@ -135,8 +145,8 @@ public class BleScanner {
                                     onScan(bleDevice);
                                 }
                             }
-                        });
-                    }
+                        }
+                    });
                 }
 
                 @Override
@@ -215,11 +225,14 @@ public class BleScanner {
     private void judgeScanOrStop() {
         try {
             if (isScan) {
+                if (scanRefreshTime < 0) {
+                    scanRefreshTime = 1500;
+                }
                 final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
                 final ScanSettings settings = new ScanSettings.Builder()
                         .setLegacy(false)
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .setReportDelay(1200)
+                        .setReportDelay(scanRefreshTime)
                         .setUseHardwareBatchingIfSupported(false).build();
                 final List<ScanFilter> filters = new ArrayList<>();
                 filters.add(new ScanFilter.Builder().build());
