@@ -238,7 +238,7 @@ public final class AbsBleConnManger {
 
                 //如果有拦截蓝牙连接的请求，此时一定要断开
                 if (boolIsInterceptConn) {
-                    ycBleLog.e("================有拦截请求，此处断开，从广播里面去拿断开的情况");
+                    ycBleLog.e("================有拦截请求，此处断开");
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -266,7 +266,13 @@ public final class AbsBleConnManger {
                             ycBleLog.e("500毫秒后，如果还连接上的，则开始扫描服务");
                             boolean boolResult = bluetoothGatt.discoverServices();
                             ycBleLog.e("discoverServices结果:" + boolResult);
-                            handler.postDelayed(discoverServiceRunnable, 1000);
+                            if (boolResult){
+                                handler.postDelayed(discoverServiceRunnable, 1000);
+                            }else {
+                                if (gatt != null) {
+                                    gatt.disconnect();
+                                }
+                            }
                         } else {
                             ycBleLog.e("500毫秒后，不再连接是情况，移除discoverService");
                             handler.removeCallbacks(discoverServiceRunnable);
@@ -280,24 +286,26 @@ public final class AbsBleConnManger {
 //                boolean boolTmp = isHandDisConn;
                 isConnected = false;
                 //已经断开了，就不存在拦截连接的说法了，置为false
-                boolIsInterceptConn = false;
+
                 if (hasConn) {
-                    //如果是断开之前有过连接，那么一定会走广播的
-                    ycBleLog.e("如果是断开之前有过连接，那么一定会走广播的");
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (absBleConnCallback != null) {
-                                absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);
-                            }
+                    //如果是拦截中断的话
+                    if (boolIsInterceptConn) {
+                        if (absBleConnCallback != null) {
+                            absBleConnCallback.connResult(BleConnState.HANDDISCONN);
                         }
-                    }, 1500);
+                    } else {
+                        if (absBleConnCallback != null) {
+                            absBleConnCallback.connResult(isHandDisConn ? BleConnState.HANDDISCONN : BleConnState.CONNEXCEPTION);
+                        }
+                    }
                 } else {
                     ycBleLog.e("如果是断开之前没有连接，很明显，异常连接");
                     if (absBleConnCallback != null) {
                         absBleConnCallback.connResult(BleConnState.CONNEXCEPTION);
                     }
                 }
+
+                boolIsInterceptConn = false;
                 bluetoothGatt.disconnect();
                 close(bluetoothGatt);
 
@@ -305,7 +313,7 @@ public final class AbsBleConnManger {
                     hasConn = false;
                 }
                 //刷新缓存
-//                refreshCache(context, bluetoothGatt);
+                refreshCache(context, bluetoothGatt);
             }
         }
 
