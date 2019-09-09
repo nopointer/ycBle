@@ -29,7 +29,13 @@ public enum MsgType {
     VK,
     //新浪微博
     SINA_WEIBO,
-    Instagram;
+    Instagram,
+
+    //微信语音
+    WECHAT_VOICE,
+    //微信视频
+    WECHAT_VIDEO,;
+
 
     public static MsgType pck2MsgType(String pkhName) {
         switch (pkhName) {

@@ -56,14 +56,27 @@ public final class NPNotificationService extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
+        ycBleLog.e("通知栏===>onNotificationPosted");
+
         NPNotificationServiceCanReceive = true;
+
+        MsgNotifyHelper.getMsgNotifyHelper().onNotificationPost(sbn);
         if (sbn == null) return;
         //应用包名
         String pckName = sbn.getPackageName();
         if (TextUtils.isEmpty(pckName)) {
             return;
         }
-        Bundle extras = sbn.getNotification().extras;
+
+        if (android.os.Build.VERSION.SDK_INT < 18) {
+            ycBleLog.e("Android platform version is lower than 18.");
+            return;
+        }
+
+        Notification notification = (Notification) sbn.getNotification();
+
+
+        Bundle extras = notification.extras;
         if (extras == null) return;
 
         //消息发送方,QQ 来电或者语音是没有发送方的，为空

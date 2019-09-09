@@ -108,7 +108,7 @@ public final class AbsBleConnManger {
             BleScanner.getInstance().registerScanListener(new ScanListener() {
                 @Override
                 public void onScan(BleDevice bleDevice) {
-                    ycBleLog.i("hadScanDeviceFlag=====>" + hadScanDeviceFlag);
+                    ycBleLog.i("hadScanDeviceFlag=====>" + hadScanDeviceFlag + "///扫描到的设备:" + new Gson().toJson(bleDevice));
                     if (hadScanDeviceFlag) {
                         if (bleDevice != null && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
                             BleScanner.getInstance().unRegisterScanListener(this);
@@ -266,9 +266,9 @@ public final class AbsBleConnManger {
                             ycBleLog.e("500毫秒后，如果还连接上的，则开始扫描服务");
                             boolean boolResult = bluetoothGatt.discoverServices();
                             ycBleLog.e("discoverServices结果:" + boolResult);
-                            if (boolResult){
+                            if (boolResult) {
                                 handler.postDelayed(discoverServiceRunnable, 1000);
-                            }else {
+                            } else {
                                 if (gatt != null) {
                                     gatt.disconnect();
                                 }

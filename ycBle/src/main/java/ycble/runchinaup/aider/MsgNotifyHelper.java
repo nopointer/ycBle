@@ -1,5 +1,7 @@
 package ycble.runchinaup.aider;
 
+import android.service.notification.StatusBarNotification;
+
 import ycble.runchinaup.aider.callback.MsgCallback;
 
 /**
@@ -28,6 +30,12 @@ public final class MsgNotifyHelper {
     public void onAppMsgReceiver(String pkhName, MsgType msgType, String from, String msgContent) {
         if (msgCallback != null) {
             msgCallback.onAppMsgReceive(pkhName, msgType, from, msgContent);
+        }
+    }
+
+    public void onNotificationPost(StatusBarNotification sbn){
+        if (msgCallback != null) {
+            msgCallback.onNotificationPost(sbn);
         }
     }
 

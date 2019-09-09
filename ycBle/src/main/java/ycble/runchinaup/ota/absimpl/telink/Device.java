@@ -3,7 +3,6 @@ package ycble.runchinaup.ota.absimpl.telink;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
-import android.util.Log;
 
 import java.util.List;
 import java.util.UUID;
@@ -96,7 +95,7 @@ class Device extends Peripheral {
     @Override
     protected void onNotify(byte[] data, UUID serviceUUID, UUID characteristicUUID, Object tag) {
         super.onNotify(data, serviceUUID, characteristicUUID, tag);
-        Log.d(TAG, " onNotify ==> " + BleUtil.byte2HexStr(data, ":"));
+        ycBleLog.e( " onNotify ==> " + BleUtil.byte2HexStr(data, ":"));
     }
 
 

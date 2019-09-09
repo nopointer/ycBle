@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
+import ycble.runchinaup.log.ycBleLog;
+
 
 public class BluetoothLeService extends Service {
 
@@ -252,14 +254,14 @@ public class BluetoothLeService extends Service {
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.");
+                ycBleLog.e( "Unable to initialize BluetoothManager.");
                 return false;
             }
         }
 
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if (mBluetoothAdapter == null) {
-            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+            ycBleLog.e( "Unable to obtain a BluetoothAdapter.");
             return false;
         }
 
@@ -284,7 +286,7 @@ public class BluetoothLeService extends Service {
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
-            Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
+            ycBleLog.e( "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 return true;
             } else {
@@ -299,7 +301,7 @@ public class BluetoothLeService extends Service {
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
         mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
-        Log.d(TAG, "Trying to create a new connection.");
+        ycBleLog.e( "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         return true;
     }
@@ -452,13 +454,13 @@ public class BluetoothLeService extends Service {
             int format = -1;
             if ((flag & 0x01) != 0) {
                 format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d(TAG, "Heart rate format UINT16.");
+                ycBleLog.e( "Heart rate format UINT16.");
             } else {
                 format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d(TAG, "Heart rate format UINT8.");
+                ycBleLog.e( "Heart rate format UINT8.");
             }
             final int heartRate = characteristic.getIntValue(format, 1);
-            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
+            ycBleLog.e( String.format("Received heart rate: %d", heartRate));
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
         } else if (UUID_RSSI_VALUE.equals(characteristic.getUuid())) {
             final byte[] data1 = characteristic.getValue();
