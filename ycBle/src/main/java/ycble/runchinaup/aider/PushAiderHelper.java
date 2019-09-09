@@ -2,10 +2,12 @@ package ycble.runchinaup.aider;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 
 import ycble.runchinaup.aider.callback.MsgCallback;
 import ycble.runchinaup.aider.phone.NPPhoneStateReceiver;
 import ycble.runchinaup.aider.sms.NPSmsReciver;
+import ycble.runchinaup.log.ycBleLog;
 
 /**
  * Created by nopointer on 2018/7/26.
@@ -16,14 +18,30 @@ public final class PushAiderHelper {
 
     private MsgNotifyHelper notifyHelper = MsgNotifyHelper.getMsgNotifyHelper();
 
+    private Handler handler = new Handler();
 
-    public void start(Context context) {
+
+    public void start(final Context context) {
         try {
             //常用的系统广播
             context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
-            Intent intent = new Intent(context, NPNotificationService.class);
-            context.startService(intent);
-            NotificationMsgUtil.reBindService(context);
+
+            NotificationMsgUtil.reStartNotifyListenService(context);
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (NotificationMsgUtil.isServiceExisted(context, NPNotificationService.class)) {
+                        ycBleLog.e("如果5秒后没有启动服务，那么就开启service");
+                        Intent intent = new Intent(context, NPNotificationService.class);
+                        context.startService(intent);
+                        NotificationMsgUtil.reStartNotifyListenService(context);
+                    }else {
+                        ycBleLog.e("监听服务已经开启");
+                    }
+                }
+            }, 2 * 1000);
+
             registerReceiver(context);
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,6 +55,7 @@ public final class PushAiderHelper {
             context.stopService(intent);
             NotificationMsgUtil.closeService(context);
             unregisterReceiver(context);
+            handler.removeCallbacksAndMessages(null);
         } catch (Exception e) {
 //            e.printStackTrace();
         }

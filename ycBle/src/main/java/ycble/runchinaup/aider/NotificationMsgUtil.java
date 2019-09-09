@@ -21,7 +21,7 @@ import ycble.runchinaup.log.ycBleLog;
  * 通知栏消息监听工具
  */
 
-final class NotificationMsgUtil {
+public final class NotificationMsgUtil {
 
     /**
      * 判断消息栏通知权限是否授权
@@ -68,8 +68,8 @@ final class NotificationMsgUtil {
     }
 
 
-    //重新绑定service
-    public static void reBindService(Context context) {
+    //开启监听通知栏的服务
+    public static void reStartNotifyListenService(Context context) {
         ycBleLog.e("reBindService==>NPNotificationService");
         ComponentName thisComponent = new ComponentName(context, NPNotificationService.class);
         PackageManager pm = context.getPackageManager();
@@ -78,7 +78,7 @@ final class NotificationMsgUtil {
     }
 
     /**
-     * 关闭服务
+     * 关闭监听通知栏的服务
      *
      * @param context
      */

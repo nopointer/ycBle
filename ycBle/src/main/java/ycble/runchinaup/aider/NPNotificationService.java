@@ -34,21 +34,36 @@ public final class NPNotificationService extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         ycBleLog.e("NPNotificationService===>onCreate");
-        startForegroundFuckAndroidP();
     }
-
-    @Override
-    public void onListenerConnected() {
-        super.onListenerConnected();
-        ycBleLog.e("通知栏服务正常，可以获取到通知信息");
-    }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         ycBleLog.e("通知栏onStartCommand");
-        startForegroundFuckAndroidP();
         return super.onStartCommand(intent, flags, startId);
+    }
+
+
+    @Override
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        ycBleLog.e("onListenerConnected====>通知栏服务正常，可以获取到通知信息");
+    }
+
+
+    @Override
+    public void onListenerDisconnected() {
+        super.onListenerDisconnected();
+        ycBleLog.e("onListenerConnected====>通知栏服务不正常，不可以获取到通知信息");
+    }
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn, RankingMap rankingMap) {
+        super.onNotificationRemoved(sbn, rankingMap);
+        ycBleLog.e("onNotificationRemoved====>");
+        if (!NotificationMsgUtil.isServiceExisted(this, NPNotificationService.class)) {
+            Intent intent = new Intent(this, NPNotificationService.class);
+            startService(intent);
+        }
     }
 
     //接收到通知消息的回调
@@ -73,8 +88,7 @@ public final class NPNotificationService extends NotificationListenerService {
             return;
         }
 
-        Notification notification = (Notification) sbn.getNotification();
-
+        Notification notification = sbn.getNotification();
 
         Bundle extras = notification.extras;
         if (extras == null) return;
@@ -149,13 +163,6 @@ public final class NPNotificationService extends NotificationListenerService {
         if (lastMsgStr != null && !TextUtils.isEmpty(lastMsgStr)) {
             lastMsgStr = null;
         }
-    }
-
-    /**
-     * fuck的 google 9.0各种坑逼问题
-     */
-    private void startForegroundFuckAndroidP() {
-        NotificationMsgUtil.reBindService(this);
     }
 
 
