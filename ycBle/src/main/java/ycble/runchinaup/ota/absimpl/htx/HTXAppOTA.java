@@ -145,7 +145,7 @@ class HTXAppOTA {
                     mIsWorcking = false;
                     return;
                 }
-                response = do_work_on_boads.LoadBinary(tmp_read, Constant.APPTYPE);
+                response = do_work_on_boads.loadBinary(tmp_read, Constant.APPTYPE);
                 SendFileRseponse(response);
 //                //burn patch
 //                // 复位硬件
@@ -237,7 +237,7 @@ class HTXAppOTA {
                     if (msg.obj != null) {
 //                        ycBleLogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
                         String toaststr = (String) msg.obj;
-                        do_work_on_boads.ResetTarget();
+                        do_work_on_boads.resetTarget();
                     }
                     break;
                 case MSG_BURN_APP_SUCCESS:
@@ -547,7 +547,7 @@ class HTXAppOTA {
 //                ycBleLog.e("peng", "DATA notify:" + Utils.bytesToHexString(data));
 
                 if (data != null) {
-                    do_work_on_boads.setBluetoothNotifyData(data, Constant.DATCHARC);
+                    do_work_on_boads.setBluetoothNotifyData(data, Constant.DATACHARC);
                 }
             }
             //OTA CMD
@@ -561,7 +561,7 @@ class HTXAppOTA {
             else if (BluetoothLeService.OTA_RX_ISP_CMD_ACTION.equals(action)) {
                 byte[] data = intent.getByteArrayExtra(BluetoothLeService.ARRAY_BYTE_DATA);
                 ycBleLog.e("ISP notify:" + Utils.bytesToHexString(data));
-                do_work_on_boads.EntryIspMoudle(Constant.MSG_ARG1_ENTRY_ISP);
+                do_work_on_boads.entryIspModel(Constant.MSG_ARG1_ENTRY_ISP);
 
                 handler.postDelayed(new Runnable() {
                     @Override

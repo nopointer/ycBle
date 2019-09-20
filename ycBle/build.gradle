@@ -6,13 +6,13 @@ group = "com.github.nopointer"
 android {
 
     compileSdkVersion var.compileSdkVersion
-    buildToolsVersion var.buildToolsVersion
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 100
-        versionName "beta_0.1.0"
+        versionCode 101
+        versionName "beta_0.1.1"
     }
 
     buildTypes {
@@ -39,6 +39,6 @@ dependencies {
     //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
     api fileTree(include: '*.jar', dir: 'libs')
-    api(name: 'htx_ota_lib', ext: 'aar')
-    api 'no.nordicsemi.android.support.v18:scanner:1.4.0'
+    api(name: 'otalib', ext: 'aar')
+    api 'no.nordicsemi.android.support.v18:scanner:1.4.2'
 }
