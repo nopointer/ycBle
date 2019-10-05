@@ -300,7 +300,7 @@ public abstract class AbsBleManager {
     }
 
 
-    private void withOnConnException() {
+    protected void withOnConnException() {
         clearSomeFlag();
         withBleConnState(BleConnState.CONNEXCEPTION);
     }
@@ -328,7 +328,7 @@ public abstract class AbsBleManager {
 
 
     //注册连接成功回调事件
-    private final void withOnConnectSuccess() {
+    protected final void withOnConnectSuccess() {
         clearSomeFlag();
         withBleConnState(BleConnState.CONNECTED);
     }
@@ -340,7 +340,7 @@ public abstract class AbsBleManager {
         withBleConnState(BleConnState.HANDDISCONN);
     }
 
-    private final void withBleConnState(BleConnState connState) {
+    public final void withBleConnState(BleConnState connState) {
         this.bleConnState = connState;
         for (BleConnCallback connCallback : bleBleConnCallbackHashSet) {
             connCallback.onConnState(connState);
