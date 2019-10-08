@@ -116,10 +116,14 @@ public abstract class AbsBleManager {
     }
 
     //当前的连接状态
-    private BleConnState bleConnState = null;
+    protected BleConnState bleConnState = null;
 
     public BleConnState getBleConnState() {
         return bleConnState;
+    }
+
+    public void setBleConnState(BleConnState bleConnState) {
+        this.bleConnState = bleConnState;
     }
 
     //注册连接回调
