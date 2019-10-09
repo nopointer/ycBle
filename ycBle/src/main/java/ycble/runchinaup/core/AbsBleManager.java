@@ -293,6 +293,13 @@ public abstract class AbsBleManager {
         return isConn;
     }
 
+
+    protected void requestConnectionPriority(int connectionPriority) {
+        if (absBleConnManger != null) {
+            absBleConnManger.requestConnectionPriority(connectionPriority);
+        }
+    }
+
     /**
      * 清除某些状态，比如任务队列,和上次的消息队列
      */

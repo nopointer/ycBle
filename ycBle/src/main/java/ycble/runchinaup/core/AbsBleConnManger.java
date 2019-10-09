@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 
@@ -235,6 +236,7 @@ public final class AbsBleConnManger {
                 ycBleLog.e("================设备连接上了，耗时:" + useTime + "S");
 
                 hasConn = true;
+
 
                 //如果有拦截蓝牙连接的请求，此时一定要断开
                 if (boolIsInterceptConn) {
@@ -667,6 +669,14 @@ public final class AbsBleConnManger {
             e.printStackTrace();
         } finally {
             return result;
+        }
+    }
+
+    protected void requestConnectionPriority(int connectionPriority) {
+        if (bluetoothGatt != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                bluetoothGatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+            }
         }
     }
 

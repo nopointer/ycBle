@@ -6,13 +6,12 @@ group = "com.github.nopointer"
 android {
 
     compileSdkVersion var.compileSdkVersion
-    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 104
-        versionName "beta_0.1.4"
+        versionCode 105
+        versionName "beta_0.1.5"
     }
 
     buildTypes {
