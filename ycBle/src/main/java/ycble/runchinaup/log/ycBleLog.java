@@ -16,7 +16,6 @@
 package ycble.runchinaup.log;
 
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -36,8 +35,6 @@ import ycble.runchinaup.util.PhoneDeviceUtil;
 public class ycBleLog {
 
     public static final String npBleTag = "ycBleTag";
-
-    static String logMac = "";
 
 
     //app的名字
@@ -74,7 +71,6 @@ public class ycBleLog {
         if (allowE) {
             Log.e(npBleTag, content);
         }
-        if (TextUtils.isEmpty(logMac)) return;
         if (allowWriteLogToLocalFile) {
             String dateTime = smp.format(new Date());
             writeFile(dateTime + "  " + content);
@@ -103,8 +99,7 @@ public class ycBleLog {
         if (!appDir.exists()) {
             appDir.mkdirs();
         }
-        String name = new SimpleDateFormat("yyyy-MM-dd______").format(new Date());
-        String fileName = name + logMac + ".txt";
+        String fileName = appName + ".txt";
         File file = new File(appDir, fileName);
         if (!file.exists()) {
             //文件第一次创建的时候,追加一些额外信息，比如app版本和手机型号等等
@@ -135,7 +130,6 @@ public class ycBleLog {
      * 删除并重新创建日志文件
      */
     public synchronized static void reCreateLogFile(String deviceMac) {
-        logMac = deviceMac;
         File appDir = new File(Environment.getExternalStorageDirectory(), "ycBleLogs/" + appName);
         if (null == appDir) return;
 
