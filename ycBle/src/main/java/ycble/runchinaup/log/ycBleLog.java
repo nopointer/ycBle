@@ -38,7 +38,7 @@ public class ycBleLog {
 
 
     //app的名字
-    static String appName = "ycBleLog";
+    public static String appName = "ycBleLog";
 
     public static void initLogDirName(String appBleLogDirName) {
         Log.e("initBleLogDir", "初始化文件夹名称" + appBleLogDirName);
