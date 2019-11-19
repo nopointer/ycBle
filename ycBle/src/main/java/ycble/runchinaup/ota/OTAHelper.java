@@ -73,6 +73,12 @@ public class OTAHelper {
         }
     }
 
+
+    public void startOTAFoTi(Context context, byte[] imageBytes, String mac, OTACallback otaCallback) {
+        TIOTAHelper.getInstance().startOTA(context, mac, imageBytes, otaCallback);
+    }
+
+
     /**
      * 释放资源
      */

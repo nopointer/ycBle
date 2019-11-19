@@ -23,4 +23,12 @@ public class TIOTAHelper {
     }
 
 
+    public void startOTA(Context context, String mac, final byte imageByes[], final OTACallback otaCallback) {
+        TiOTAImpl tiOTA = new TiOTAImpl();
+        tiOTA.setOtaCallback(otaCallback);
+        tiOTA.setImageByes(imageByes);
+        tiOTA.startOTA(mac);
+    }
+
+
 }

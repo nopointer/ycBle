@@ -1,6 +1,7 @@
 package ycble.runchinaup.ota.absimpl.ti;
 
 import android.os.Handler;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +33,7 @@ class TiOTAImpl extends AbsBleManager implements TIBleCfg {
     private OTACallback otaCallback;
     private ImgHdr mFileImgHdr = new ImgHdr();
 
-    private final byte[] mFileBuffer = new byte[FILE_BUFFER_SIZE];
+    private byte[] mFileBuffer = new byte[FILE_BUFFER_SIZE];
 
     private final byte[] mOadBuffer = new byte[OAD_BUFFER_SIZE];
 
@@ -47,6 +48,12 @@ class TiOTAImpl extends AbsBleManager implements TIBleCfg {
     private int imageDataIndex = 0;
     private boolean isSuccess = false;
 
+
+    private byte[] imageByes = null;
+
+    public void setImageByes(byte[] imageByes) {
+        this.imageByes = imageByes;
+    }
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
@@ -217,18 +224,24 @@ class TiOTAImpl extends AbsBleManager implements TIBleCfg {
 
     private void loadFile() {
         // Load binary file
-        try {
-            // Read the file raw into a buffer
-            InputStream stream;
-            File f = new File(filePath);
-            stream = new FileInputStream(f);
-            stream.read(mFileBuffer, 0, mFileBuffer.length);
-            stream.close();
-        } catch (IOException e) {
-            // Handle exceptions here
-            ycBleLog.e("File open failed: " + filePath + "\n");
+        if (TextUtils.isEmpty(filePath) && imageByes != null) {
+            if (mFileBuffer.length < imageByes.length) {
+                mFileBuffer = new byte[imageByes.length];
+            }
+            System.arraycopy(imageByes, 0, mFileBuffer, 0, imageByes.length);
+        } else {
+            try {
+                // Read the file raw into a buffer
+                InputStream stream;
+                File f = new File(filePath);
+                stream = new FileInputStream(f);
+                stream.read(mFileBuffer, 0, mFileBuffer.length);
+                stream.close();
+            } catch (IOException e) {
+                // Handle exceptions here
+                ycBleLog.e("File open failed: " + filePath + "\n");
+            }
         }
-
         // Show image info
         mFileImgHdr.ver = BleUtil.byte2ShortLR(mFileBuffer[5], mFileBuffer[4]);
         mFileImgHdr.len = BleUtil.byte2ShortLR(mFileBuffer[7], mFileBuffer[6]);
