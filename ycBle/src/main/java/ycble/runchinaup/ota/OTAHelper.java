@@ -74,8 +74,12 @@ public class OTAHelper {
     }
 
 
-    public void startOTAFoTi(Context context, byte[] imageBytes, String mac, OTACallback otaCallback) {
+    public void startOTAForTi(Context context, byte[] imageBytes, String mac, OTACallback otaCallback) {
         TIOTAHelper.getInstance().startOTA(context, mac, imageBytes, otaCallback);
+    }
+
+    public void stopOTAForTi(){
+        TIOTAHelper.getInstance().stopOTA();
     }
 
 
