@@ -113,6 +113,22 @@ public class BleUtil {
         return result;
     }
 
+    public static short byte2ShortLR(byte... arr) {
+        short result = 0, len = (short) arr.length;
+        for (int i = 0; i < len; i++) {
+            result |= ((arr[i] & 0xff) << (len - i - 1) * 8);
+        }
+        return result;
+    }
+
+    public static short byte2ShortRL(byte... arr) {
+        short result = 0, len = (short) arr.length;
+        for (int i = 0; i < len; i++) {
+            result |= ((arr[i] & 0xff) << (i) * 8);
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
 //        System.out.println(BleUtil.byte2HexStr(int2ByteArrRL(01, 2)));
 //        ACED000574000120

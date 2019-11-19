@@ -284,9 +284,17 @@ public abstract class AbsBleManager {
     public final boolean disAbleNotityOrIndication(UUID U_ser, UUID U_chara) throws BleUUIDNullException {
         if (absBleConnManger != null) {
             insertBeforeWrite(BleUnitTask.createDisEnableNotifyOrIndicate(U_ser, U_chara, "使不能通知/指示"));
-            return absBleConnManger.disAbleNotityOrIndication(U_ser, U_chara);
+            return absBleConnManger.disAbleNotifyOrIndication(U_ser, U_chara);
         }
         return false;
+    }
+
+    //使不能通知/指示
+    public final void setNotifyListen(UUID U_ser, UUID U_chara, boolean enable) throws BleUUIDNullException {
+        if (absBleConnManger != null) {
+            insertBeforeWrite(BleUnitTask.createSingleListen(U_ser, U_chara, enable,"监听与否"));
+            absBleConnManger.setNotifyListen(U_ser, U_chara, enable);
+        }
     }
 
     public final boolean isConn() {
@@ -438,7 +446,6 @@ public abstract class AbsBleManager {
                 ycBleLog.e("unitTask 异常====>" + bleUnitTaskIndex);
                 return;
             }
-            ;
             try {
                 switch (unitTask.getOptionType()) {
                     case BleUnitTask.TYPE_READ: {
@@ -472,6 +479,11 @@ public abstract class AbsBleManager {
                         disAbleNotityOrIndication(unitTask.getU_service(), unitTask.getU_chara());
                     }
                     break;
+                    case BleUnitTask.TYPE_SET_LISTEN: {
+                        ycBleLog.d(npBleTag + " 设置监听与否<<<< " + unitTask.msg);
+                        setNotifyListen(unitTask.getU_service(), unitTask.getU_chara(),unitTask.isEnableNotifyListen());
+                        toNextTask();
+                    }
                 }
 
             } catch (BleUUIDNullException e) {

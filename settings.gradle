@@ -1,1 +1,1 @@
-include ':app',':ycBle'
+include ':app',':ycBle',':otaHelper'

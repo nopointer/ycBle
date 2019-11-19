@@ -495,8 +495,15 @@ public final class AbsBleConnManger {
 
 
     //关闭通知/指示
-    public boolean disAbleNotityOrIndication(UUID serViceUUID, UUID charaUUID) throws BleUUIDNullException {
+    public boolean disAbleNotifyOrIndication(UUID serViceUUID, UUID charaUUID) throws BleUUIDNullException {
         return enableNotifyOrIndication(serViceUUID, charaUUID, false, BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+    }
+
+    //设置监听
+    public void setNotifyListen(UUID serViceUUID, UUID charaUUID, boolean enable) throws BleUUIDNullException {
+        BluetoothGattService service = getService(serViceUUID);
+        BluetoothGattCharacteristic characteristic = getChara(service, charaUUID);
+        bluetoothGatt.setCharacteristicNotification(characteristic, enable);
     }
 
     //关闭蓝牙

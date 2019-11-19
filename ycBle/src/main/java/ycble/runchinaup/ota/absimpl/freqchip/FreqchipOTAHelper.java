@@ -17,10 +17,10 @@ public class FreqchipOTAHelper {
     private FreqchipOTAHelper() {
     }
 
-    private OTAImpl otaImpl = null;
+    private FreqOTAImpl otaImpl = null;
 
     public void startOTA(Context context, String mac, String filePath, OTACallback otaCallback) {
-        otaImpl = new OTAImpl();
+        otaImpl = new FreqOTAImpl();
         otaImpl.setFilePath(filePath);
         otaImpl.setOtaCallback(otaCallback);
         otaImpl.connDevice(mac);

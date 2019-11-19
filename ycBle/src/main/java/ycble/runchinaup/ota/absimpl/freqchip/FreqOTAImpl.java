@@ -21,7 +21,7 @@ import ycble.runchinaup.util.BleUtil;
 
 import static ycble.runchinaup.ota.absimpl.freqchip.FreqchipUtils.OTA_CMD_WRITE_DATA;
 
-class OTAImpl extends AbsBleManager implements BleCfg {
+class FreqOTAImpl extends AbsBleManager implements FreqBleCfg {
 
     private String filePath = null;
 
@@ -43,7 +43,7 @@ class OTAImpl extends AbsBleManager implements BleCfg {
 
     private MyHandler myHandler = new MyHandler();
 
-    public OTAImpl() {
+    public FreqOTAImpl() {
         init(UUID_OTA_SEND_DATA);
     }
 

@@ -20,7 +20,7 @@
 //
 //import static ycble.runchinaup.ota.absimpl.fuwokun.FRKUtils.OTA_CMD_WRITE_DATA;
 //
-//class OTAImplBAk extends AbsBleManager implements BleCfg {
+//class OTAImplBAk extends AbsBleManager implements FreqBleCfg {
 //
 //    private String filePath = "/storage/emulated/0/Download/Bluetooth/OTA_TEST1.bin";
 //

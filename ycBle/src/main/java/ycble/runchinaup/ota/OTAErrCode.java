@@ -22,4 +22,7 @@ public class OTAErrCode {
      * 富萵坤 文件校验不通过
      */
     public static final int FWK_FILE_INVALIDE =40;
+
+
+    public static final int TI_FAILURE =50;
 }

@@ -2,10 +2,10 @@ package ycble.runchinaup.ota.absimpl.freqchip;
 
 import java.util.UUID;
 
-interface BleCfg {
+interface FreqBleCfg {
 
     /**
-     * OTA数据交互的特征
+     * OTA数据交互的服务
      */
     final static UUID UUID_OTA_SERVICE = UUID.fromString("0000fe00-0000-1000-8000-00805f9b34fb");
 

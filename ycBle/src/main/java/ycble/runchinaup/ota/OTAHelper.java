@@ -9,6 +9,7 @@ import ycble.runchinaup.ota.absimpl.freqchip.FreqchipOTAHelper;
 import ycble.runchinaup.ota.absimpl.htx.HTXOTAHelper;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
 import ycble.runchinaup.ota.absimpl.telink.TeLinkOTAHelper;
+import ycble.runchinaup.ota.absimpl.ti.TIOTAHelper;
 import ycble.runchinaup.ota.callback.OTACallback;
 
 /**
@@ -47,7 +48,6 @@ public class OTAHelper {
         switch (firmType) {
             //nordic的ota 也是默认的ota
             case NORDIC:
-            default:
                 DfuHelper.getDfuHelper().start(context, filePath, mac, name, otaCallback, dfuBaseService);
                 break;
             case HTX://汉天下的OTA
@@ -63,6 +63,12 @@ public class OTAHelper {
                 break;
             case FREQCHIP:
                 FreqchipOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
+                break;
+            case TI:
+                TIOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
+                break;
+            default:
+                ycBleLog.e("暂无合适的固件");
                 break;
         }
     }

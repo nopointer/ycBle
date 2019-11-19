@@ -17,6 +17,8 @@ public class BleUnitTask {
     public static final int TYPE_ENABLE_INDICATE = 5;
     //关闭通知或者指示
     public static final int TYPE_DISABLE_NOTIFY_OR_INDICATE = 6;
+    //设置监听与否
+    public static final int TYPE_SET_LISTEN =7;
 
     //
     public String msg;
@@ -24,6 +26,7 @@ public class BleUnitTask {
     private UUID U_chara;
     private int optionType;
     private byte[] data;
+    private boolean enableNotifyListen;
 
     public int getOptionType() {
         return optionType;
@@ -35,6 +38,10 @@ public class BleUnitTask {
 
     public UUID getU_chara() {
         return U_chara;
+    }
+
+    public boolean isEnableNotifyListen() {
+        return enableNotifyListen;
     }
 
     public byte[] getData() {
@@ -133,6 +140,20 @@ public class BleUnitTask {
             task.msg = msg[0];
         } else {
             String msgType = "notify";
+            task.msg = String.format("%s{ %s>>>>%s", msgType, u_service.toString(), u_chara.toString());
+        }
+        return task;
+    }
+
+    //创建一个设置是否监听的任务（只设置监听，不操作使能与否）
+    public static BleUnitTask createSingleListen(UUID u_service, UUID u_chara,boolean enable, String... msg) {
+        BleUnitTask task = new BleUnitTask(u_service, u_chara);
+        task.enableNotifyListen =enable;
+        task.optionType = TYPE_SET_LISTEN;
+        if (msg != null && msg.length > 0) {
+            task.msg = msg[0];
+        } else {
+            String msgType = "notify Listen";
             task.msg = String.format("%s{ %s>>>>%s", msgType, u_service.toString(), u_chara.toString());
         }
         return task;
