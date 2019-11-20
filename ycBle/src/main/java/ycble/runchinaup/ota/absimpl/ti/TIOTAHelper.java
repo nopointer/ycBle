@@ -6,7 +6,7 @@ import ycble.runchinaup.ota.callback.OTACallback;
 
 public class TIOTAHelper {
 
-    TiOTAImpl tiOTA = new TiOTAImpl();
+    TiOTAImpl tiOTA = null;
     private static final TIOTAHelper ourInstance = new TIOTAHelper();
 
     public static TIOTAHelper getInstance() {
@@ -18,7 +18,9 @@ public class TIOTAHelper {
 
 
     public void startOTA(Context context, String mac, final String filePath, final OTACallback otaCallback) {
-
+        if (tiOTA == null) {
+            tiOTA = new TiOTAImpl();
+        }
         tiOTA.setOtaCallback(otaCallback);
         tiOTA.setFilePath(filePath);
         tiOTA.startOTA(mac);
@@ -26,6 +28,9 @@ public class TIOTAHelper {
 
 
     public void startOTA(Context context, String mac, final byte imageByes[], final OTACallback otaCallback) {
+        if (tiOTA == null) {
+            tiOTA = new TiOTAImpl();
+        }
         tiOTA.setOtaCallback(otaCallback);
         tiOTA.setImageByes(imageByes);
         tiOTA.startOTA(mac);
@@ -34,6 +39,7 @@ public class TIOTAHelper {
     public void stopOTA() {
         if (tiOTA != null) {
             tiOTA.stopOTA();
+            tiOTA = null;
         }
     }
 

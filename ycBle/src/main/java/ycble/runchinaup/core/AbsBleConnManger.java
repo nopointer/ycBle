@@ -74,6 +74,12 @@ public final class AbsBleConnManger {
         mustUUIDList.add(uuid);
     }
 
+    protected void clearMUstUUID() {
+        if (mustUUIDList != null) {
+            mustUUIDList.clear();
+        }
+    }
+
 
     /**
      * 连接设备

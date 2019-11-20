@@ -67,6 +67,7 @@ public abstract class AbsBleManager {
     protected void init(UUID... mustUUIDs) {
         absBleConnManger = new AbsBleConnManger(mContext);
         if (mustUUIDs != null) {
+            absBleConnManger.clearMUstUUID();
             for (UUID uuid : mustUUIDs) {
                 absBleConnManger.addMustUUID(uuid);
             }
@@ -292,7 +293,7 @@ public abstract class AbsBleManager {
     //使不能通知/指示
     public final void setNotifyListen(UUID U_ser, UUID U_chara, boolean enable) throws BleUUIDNullException {
         if (absBleConnManger != null) {
-            insertBeforeWrite(BleUnitTask.createSingleListen(U_ser, U_chara, enable,"监听与否"));
+            insertBeforeWrite(BleUnitTask.createSingleListen(U_ser, U_chara, enable, "监听与否"));
             absBleConnManger.setNotifyListen(U_ser, U_chara, enable);
         }
     }
@@ -481,7 +482,7 @@ public abstract class AbsBleManager {
                     break;
                     case BleUnitTask.TYPE_SET_LISTEN: {
                         ycBleLog.d(npBleTag + " 设置监听与否<<<< " + unitTask.msg);
-                        setNotifyListen(unitTask.getU_service(), unitTask.getU_chara(),unitTask.isEnableNotifyListen());
+                        setNotifyListen(unitTask.getU_service(), unitTask.getU_chara(), unitTask.isEnableNotifyListen());
                         toNextTask();
                     }
                 }
