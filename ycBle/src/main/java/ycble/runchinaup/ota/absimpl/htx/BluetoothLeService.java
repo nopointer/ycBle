@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import ycble.runchinaup.log.ycBleLog;
+import ycble.runchinaup.util.BleUtil;
 
 
 public class BluetoothLeService extends Service {
@@ -212,6 +213,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
 
+            ycBleLog.e("onCharacteristicChanged==>"+characteristic.getUuid()+"///"+BleUtil.byte2HexStr(characteristic.getValue()));
 
 //        	if(SampleGattAttributes.BLUE_RECV_VALUE.equals(characteristic.getUuid().toString())){
 //        		
@@ -240,6 +242,8 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 //            Log.e("peng","gatt1gatt1:"+mGattCallback);
             Log.i("DEBUG_OTA", "write status: " + status);
+            ycBleLog.e("onCharacteristicWrite==>"+characteristic.getUuid()+"///"+BleUtil.byte2HexStr(characteristic.getValue()));
+
             write_characer_lock.release(1);
 //        	if(SampleGattAttributes.otas_tx_dat_uuid.equals(characteristic.getUuid().toString()))
 //        	{

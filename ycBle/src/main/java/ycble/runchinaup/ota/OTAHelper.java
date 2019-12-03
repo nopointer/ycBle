@@ -10,6 +10,7 @@ import ycble.runchinaup.ota.absimpl.htx.HTXOTAHelper;
 import ycble.runchinaup.ota.absimpl.nordic.DfuHelper;
 import ycble.runchinaup.ota.absimpl.telink.TeLinkOTAHelper;
 import ycble.runchinaup.ota.absimpl.ti.TIOTAHelper;
+import ycble.runchinaup.ota.absimpl.xc.XcOTAImpl;
 import ycble.runchinaup.ota.callback.OTACallback;
 
 /**
@@ -67,6 +68,9 @@ public class OTAHelper {
             case TI:
                 TIOTAHelper.getInstance().startOTA(context, mac, filePath, otaCallback);
                 break;
+            case XC:
+                new XcOTAImpl().startOTA(context, mac, filePath, otaCallback);
+                break;
             default:
                 ycBleLog.e("暂无合适的固件");
                 break;
@@ -78,7 +82,7 @@ public class OTAHelper {
         TIOTAHelper.getInstance().startOTA(context, mac, imageBytes, otaCallback);
     }
 
-    public void stopOTAForTi(){
+    public void stopOTAForTi() {
         TIOTAHelper.getInstance().stopOTA();
     }
 

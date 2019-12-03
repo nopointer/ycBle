@@ -26,6 +26,8 @@ public class HTXOTAHelper {
         return otaCallback;
     }
 
+
+
     public void setOtaCallback(OTACallback otaCallback) {
         this.otaCallback = otaCallback;
     }
@@ -40,18 +42,26 @@ public class HTXOTAHelper {
 
 
     public void startOTA(Context context) {
-        appOTA = new HTXAppOTA();
-        appOTA.setOtaCallback(otaCallback);
-        appOTA.setAppFileStringPath(appFilePath);
-        appOTA.setmDeviceAddress(deviceMac);
-        appOTA.startOTA(context);
+//        appOTA = new HTXAppOTA();
+//        appOTA.setOtaCallback(otaCallback);
+//        appOTA.setAppFileStringPath(appFilePath);
+//        appOTA.setmDeviceAddress(deviceMac);
+//        appOTA.startOTA(context);
+////
+        HTXOTAImpl htxotaImpl =new HTXOTAImpl();
+        htxotaImpl.setMac(deviceMac);
+        htxotaImpl.setOtaCallback(otaCallback);
+        htxotaImpl.setContext(context);
+        htxotaImpl.startOTA();
+
+
     }
 
 
     public void free() {
-        if (appOTA != null) {
-            appOTA.free();
-        }
+//        if (appOTA != null) {
+//            appOTA.free();
+//        }
 
     }
 

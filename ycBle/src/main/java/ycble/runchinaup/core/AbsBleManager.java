@@ -483,8 +483,9 @@ public abstract class AbsBleManager {
                     case BleUnitTask.TYPE_SET_LISTEN: {
                         ycBleLog.d(npBleTag + " 设置监听与否<<<< " + unitTask.msg);
                         setNotifyListen(unitTask.getU_service(), unitTask.getU_chara(), unitTask.isEnableNotifyListen());
-                        toNextTask();
+                        taskSuccess();
                     }
+                    break;
                 }
 
             } catch (BleUUIDNullException e) {
@@ -940,5 +941,6 @@ public abstract class AbsBleManager {
      * 连接异常回调
      */
     public abstract void onConnException();
+
 
 }

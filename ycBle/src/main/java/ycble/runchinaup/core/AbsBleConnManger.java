@@ -108,6 +108,10 @@ public final class AbsBleConnManger {
         startConnTime = System.currentTimeMillis();
 
         if (!TextUtils.isEmpty(bluetoothDevice.getName())) {
+            if (bluetoothGatt != null) {
+                ycBleLog.e("已经有了缓存了=======");
+            }
+            refreshCache(context, bluetoothGatt);
             bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
         } else {
             ycBleLog.e("名称为空，需要开启一下扫描来缓存一下设备名称");
@@ -533,17 +537,21 @@ public final class AbsBleConnManger {
     }
 
     //=====================================================
-    //雷打不动的方法，需不需要修改什么==================================================
+    //雷打不动的方法，不需要修改什么==================================================
     //=====================================================
     //刷新缓存
     public static void refreshCache(Context context, BluetoothGatt gatt) {
         final BluetoothManager manager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         final List<BluetoothDevice> devices = manager.getConnectedDevices(BluetoothProfile.GATT);
-        ycBleLog.e(npBleTag + devices.size() + "");
+        ycBleLog.e(npBleTag + "当前连接列表里面，设备连接个数:" + devices.size());
         for (BluetoothDevice b : devices) {
             ycBleLog.d(npBleTag + b.getAddress());
         }
         try {
+            if (gatt == null) {
+                ycBleLog.e("gatt======null");
+                return;
+            }
             BluetoothGatt localBluetoothGatt = gatt;
             Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
             if (localMethod != null) {

@@ -7,6 +7,9 @@ public class OTAErrCode {
      */
     public static final int LOST_CONN =1;
 
+    public static final int UUID_ERROR =2;
+
+
 
     /**
      * 连接中断了 nrf
@@ -25,4 +28,8 @@ public class OTAErrCode {
 
 
     public static final int TI_FAILURE =50;
+
+
+
+    public static final int FAILURE =-1;
 }

@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 111
-        versionName "beta_0.2.1"
+        versionCode 112
+        versionName "beta_0.2.2"
     }
 
     buildTypes {
@@ -30,14 +30,13 @@ android {
 
 
 dependencies {
-
-    testImplementation "junit:junit:4.12"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
-
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //dfu nordic
     //    implementation 'no.nordicsemi.android:dfu:1.6.1'
     implementation 'no.nordicsemi.android:dfu:1.7.0'
     api fileTree(include: '*.jar', dir: 'libs')
     api(name: 'otalib', ext: 'aar')
     api 'no.nordicsemi.android.support.v18:scanner:1.4.2'
+    implementation project(':xcSupportBle')
 }

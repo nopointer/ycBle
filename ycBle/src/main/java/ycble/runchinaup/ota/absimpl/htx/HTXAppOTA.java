@@ -138,6 +138,7 @@ class HTXAppOTA {
                 try {
                     //do_work_on_boads.app_buf = op.readSDFile(file_path);
                     tmp_read = op.readSDFile(appFileStringPath);
+                    ycBleLog.e("tmp_read==>" + tmp_read.length);
 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -191,6 +192,7 @@ class HTXAppOTA {
                 break;
         }
 
+        ycBleLog.e("response:" + response + " /// detail:" + detail);
 //        ycBleLogUtils.e("detail:" + detail);
         Message msg = handler.obtainMessage();
         msg.arg1 = MSG_OTA_RESEPONSE;
@@ -209,12 +211,11 @@ class HTXAppOTA {
             if (msg == null)
                 return;
 
-            Message msg2 = msg;
             ycBleLog.e("handleMessage:MsgWhat===========> " + msg.what);
-            if (msg2.what == Constant.MSG_WHAT_READ_PART) {
-                int addr = msg2.arg1;
-                int length = msg2.arg2;
-                switch ((Integer) msg2.obj) {
+            if (msg.what == Constant.MSG_WHAT_READ_PART) {
+                int addr = msg.arg1;
+                int length = msg.arg2;
+                switch ((Integer) msg.obj) {
                     case Constant.APPTYPE:
                         break;
                     case Constant.CONFGTYPE:
@@ -224,19 +225,17 @@ class HTXAppOTA {
                 }
 
 //                ycBleLog.e("huntersun", "hand addr:" + addr + " length:" + length);
-            } else if (msg2.what == 10) {
-                if (msg2.obj != null) {
-                    String str = (String) msg2.obj;
+            } else if (msg.what == 10) {
+                if (msg.obj != null) {
+                    String str = (String) msg.obj;
                 }
             }
 
 
-            ycBleLog.e("msg2.arg1========>" + msg2.arg1);
-            switch (msg2.arg1) {
+            ycBleLog.e("msg2.arg1========>" + msg.arg1);
+            switch (msg.arg1) {
                 case MSG_OTA_RESEPONSE:
                     if (msg.obj != null) {
-//                        ycBleLogUtils.e("=====MSG_OTA_RESEPONSE==>" + MSG_OTA_RESEPONSE);
-                        String toaststr = (String) msg.obj;
                         do_work_on_boads.resetTarget();
                     }
                     break;
@@ -246,7 +245,7 @@ class HTXAppOTA {
                 case MSG1_NO_FILE:
                     break;
                 case Constant.MSG_ARG1_KBS:
-                    float kbs = (Float) msg2.obj;
+                    float kbs = (Float) msg.obj;
                     ycBleLog.e(kbs + "kB/s");
                     break;
                 case MSG_DISCONNECT_BLE:
@@ -263,12 +262,12 @@ class HTXAppOTA {
                     break;
                 case MSG_FLASH_EMPTY:
                     break;
-                case Constant.MSG_ARG1_SEND_OTA_DATA:
+                case Constant.MSG_ARG1_SEND_OTA_DATA://1004
 
                     int pos = 0;
-                    int len = msg2.arg2;
+                    int len = msg.arg2;
                     int tmp = len % 20;
-                    byte[] senddat = (byte[]) msg2.obj;
+                    byte[] senddat = (byte[]) msg.obj;
                     boolean res;
                     if (ota_tx_dat_charac == null) {
                         ycBleLog.e(" 发数据 OTA has not discover the right character!");
@@ -324,12 +323,12 @@ class HTXAppOTA {
                     }
                     break;
                 case Constant.MSG_ARG1_PROGRESS_BAR_MAX:
-                    int len1 = msg2.arg2;
+                    int len1 = msg.arg2;
                     ycBleLog.e("len==>1 " + len1);
                     fileTotalSize = len1;
                     break;
                 case Constant.MSG_ARG1_PROGRESS_BAR_UPDATA:
-                    int currentValue = msg2.arg2;
+                    int currentValue = msg.arg2;
                     float progress = (currentValue * 100) / fileTotalSize;
                     ycBleLog.e("len==>2 " + currentValue + "/" + fileTotalSize);
                     if (otaCallback != null) {
@@ -343,11 +342,13 @@ class HTXAppOTA {
                     ycBleLog.e("OTA exchange key please try again");
                     mBLE.disconnect();
                     break;
-                case Constant.MSG_ARG1_SEND_OTA_CMD: {
+
+
+                case Constant.MSG_ARG1_SEND_OTA_CMD: { //1000
                     int pos1 = 0;
-                    int len3 = msg2.arg2;
+                    int len3 = msg.arg2;
                     int tmp1 = len3 % 20;
-                    byte[] sendcmd = (byte[]) msg2.obj;
+                    byte[] sendcmd = (byte[]) msg.obj;
                     boolean res1 = false;
                     if (ota_tx_cmd_charac == null) {
                         ycBleLog.e("OTA has not discover the right character!");
@@ -419,7 +420,7 @@ class HTXAppOTA {
                     if (isSuccess) {
                         otaCallback.onSuccess();
                     } else {
-                        otaCallback.onFailure(OTAErrCode.LOST_CONN,"The connection is lost while OTA is working!");
+                        otaCallback.onFailure(OTAErrCode.LOST_CONN, "The connection is lost while OTA is working!");
                     }
                 }
             } else if (BluetoothLeService.ACTION_GATT_STATUS_133.equals(action)) {
@@ -432,7 +433,7 @@ class HTXAppOTA {
                     if (isSuccess) {
                         otaCallback.onSuccess();
                     } else {
-                        otaCallback.onFailure(OTAErrCode.LOST_CONN,"The connection is lost while OTA is working!");
+                        otaCallback.onFailure(OTAErrCode.LOST_CONN, "The connection is lost while OTA is working!");
                     }
                 }
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
