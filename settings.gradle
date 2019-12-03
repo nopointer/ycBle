@@ -1,1 +1,2 @@
-include ':app',':ycBle',':otaHelper'
+include ':app',':ycBle',':otaHelper', ':customdeviceui'
+include ':xcSupportBle'
