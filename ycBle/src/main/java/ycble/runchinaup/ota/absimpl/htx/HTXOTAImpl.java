@@ -34,6 +34,9 @@ public class HTXOTAImpl extends AbsBleManager implements HTXBleCfg {
     private WorkOnBoads workOnBoads;
     private String filePath = "/sdcard/otaHelper/firmware/V5HD_H_20191024.bin";
 
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
     private String mac;
     private Context context;
@@ -113,10 +116,6 @@ public class HTXOTAImpl extends AbsBleManager implements HTXBleCfg {
 
                     if (tmp1 != 0) {
                         byte[] packet_data = new byte[tmp1];
-                        if (BleUtil.byte2HexStr(packet_data).equals("00000000")) {
-                            disConn();
-                            return;
-                        }
                         System.arraycopy(sendcmd, pos1, packet_data, 0, tmp1);
                         if (isConn()) {
                             ycBleLog.e("cmd data:" + Utils.bytesToHexString(packet_data));

@@ -51,9 +51,9 @@ public class HTXOTAHelper {
         HTXOTAImpl htxotaImpl =new HTXOTAImpl();
         htxotaImpl.setMac(deviceMac);
         htxotaImpl.setOtaCallback(otaCallback);
+        htxotaImpl.setFilePath(appFilePath);
         htxotaImpl.setContext(context);
         htxotaImpl.startOTA();
-
 
     }
 
