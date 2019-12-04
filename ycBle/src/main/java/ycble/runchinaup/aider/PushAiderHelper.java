@@ -20,8 +20,12 @@ public final class PushAiderHelper {
 
     private Handler handler = new Handler();
 
-
-    public void start(final Context context) {
+    /**
+     * 开始监听通知栏消息
+     *
+     * @param context
+     */
+    public void startListeningForNotifications(final Context context) {
         try {
             //常用的系统广播
             context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
@@ -36,28 +40,30 @@ public final class PushAiderHelper {
                         Intent intent = new Intent(context, NPNotificationService.class);
                         context.startService(intent);
                         NotificationMsgUtil.reStartNotifyListenService(context);
-                    }else {
+                    } else {
                         ycBleLog.e("监听服务已经开启");
                     }
                 }
             }, 2 * 1000);
-
-            registerReceiver(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void stop(Context context) {
+    /**
+     * 停止监听通知栏消息
+     *
+     * @param context
+     */
+    public void stopListeningForNotifications(Context context) {
         try {
             context.unregisterReceiver(npLiveReceiver);
             Intent intent = new Intent(context, NPNotificationService.class);
             context.stopService(intent);
             NotificationMsgUtil.closeService(context);
-            unregisterReceiver(context);
             handler.removeCallbacksAndMessages(null);
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -102,18 +108,68 @@ public final class PushAiderHelper {
     //短信接收广播接收器
     private NPSmsReciver npSmsReciver = new NPSmsReciver();
 
-    //注册广播
-    private void registerReceiver(Context context) {
+    /**
+     * 注册来电广播和短信广播
+     *
+     * @param context
+     */
+    public void registerCallAndSmsReceiver(Context context) {
+        registerCallReceiver(context);
+        registerSmsReceiver(context);
+    }
+
+
+    /**
+     * 注册来电广播
+     *
+     * @param context
+     */
+    public void registerCallReceiver(Context context) {
         //注册来电状态的广播
         context.registerReceiver(npPhoneStateReceiver, NPPhoneStateReceiver.createIntentFilter());
+    }
+
+    /**
+     * 注册短信广播
+     *
+     * @param context
+     */
+    public void registerSmsReceiver(Context context) {
         //注册短信接收的广播
         context.registerReceiver(npSmsReciver, NPSmsReciver.createIntentFilter());
     }
 
+    /**
+     * 注销来电广播和短信广播
+     *
+     * @param context
+     */
+    public void unRegisterCallAndSmsReceiver(Context context) {
+        unRegisterCallReceiver(context);
+        unRegisterSmsReceiver(context);
+    }
 
-    private void unregisterReceiver(Context context) {
+
+    /**
+     * 注销来电广播
+     *
+     * @param context
+     */
+    public void unRegisterCallReceiver(Context context) {
         try {
             context.unregisterReceiver(npPhoneStateReceiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 注销短信广播
+     *
+     * @param context
+     */
+    public void unRegisterSmsReceiver(Context context) {
+        try {
             context.unregisterReceiver(npSmsReciver);
         } catch (Exception e) {
             e.printStackTrace();
