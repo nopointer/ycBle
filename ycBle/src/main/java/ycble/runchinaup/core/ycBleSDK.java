@@ -21,9 +21,11 @@ public class ycBleSDK {
         BleScanner.init(context);
         AbsBleManager.initSDK(context);
         if (enablePushAider) {
-            PushAiderHelper.getAiderHelper().start(context);
+            PushAiderHelper.getAiderHelper().startListeningForNotifications(context);
+            PushAiderHelper.getAiderHelper().registerCallAndSmsReceiver(context);
         }else {
-            PushAiderHelper.getAiderHelper().stop(context);
+            PushAiderHelper.getAiderHelper().stopListeningForNotifications(context);
+            PushAiderHelper.getAiderHelper().unRegisterCallAndSmsReceiver(context);
         }
     }
 
