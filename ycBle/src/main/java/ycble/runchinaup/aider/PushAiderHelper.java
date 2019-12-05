@@ -27,8 +27,6 @@ public final class PushAiderHelper {
      */
     public void startListeningForNotifications(final Context context) {
         try {
-            //常用的系统广播
-            context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
 
             NotificationMsgUtil.reStartNotifyListenService(context);
 
@@ -51,13 +49,29 @@ public final class PushAiderHelper {
     }
 
     /**
+     * 是否允许通知监听栏运行久一点
+     *
+     * @param context
+     * @param enable
+     */
+    public void enablePushAiderAlive(Context context, boolean enable) {
+        if (context == null) return;
+        //常用的系统广播
+        if (enable) {
+            context.registerReceiver(npLiveReceiver, ReStartNotificationReceiver.createIntentFilter());
+        } else {
+            context.unregisterReceiver(npLiveReceiver);
+        }
+    }
+
+
+    /**
      * 停止监听通知栏消息
      *
      * @param context
      */
     public void stopListeningForNotifications(Context context) {
         try {
-            context.unregisterReceiver(npLiveReceiver);
             Intent intent = new Intent(context, NPNotificationService.class);
             context.stopService(intent);
             NotificationMsgUtil.closeService(context);

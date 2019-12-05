@@ -1,7 +1,7 @@
 package ycble.runchinaup.ota.absimpl.xc;
 
 
-import no.nordicsemi.android.ble.BleManagerCallbacks;
+import ycble.runchinaup.ota.absimpl.xc.no.nordicsemi.android.BleManagerCallbacks;
 
 public abstract class OTAManagerCallbacks implements BleManagerCallbacks {
     public abstract void onOTAStart();

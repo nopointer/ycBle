@@ -1,4 +1,4 @@
-package no.nordicsemi.android.ble;
+package ycble.runchinaup.ota.absimpl.xc.no.nordicsemi.android;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;

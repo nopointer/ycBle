@@ -1,4 +1,4 @@
-package no.nordicsemi.android.ble.utils;
+package ycble.runchinaup.ota.absimpl.xc.no.nordicsemi.android.utils;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
 public class BleConnectionCompat {
-    private static final  String TAG=BleConnectionCompat.class.getSimpleName();
+    private static final  String TAG= BleConnectionCompat.class.getSimpleName();
     private final Context context;
 
     public BleConnectionCompat(Context context) {

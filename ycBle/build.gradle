@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion var.minSdkVersion
         targetSdkVersion var.targetSdkVersion
-        versionCode 114
-        versionName "beta_0.2.4"
+        versionCode 115
+        versionName "beta_0.2.5"
     }
 
     buildTypes {
@@ -38,5 +38,4 @@ dependencies {
     api fileTree(include: '*.jar', dir: 'libs')
     api(name: 'otalib', ext: 'aar')
     api 'no.nordicsemi.android.support.v18:scanner:1.4.2'
-    implementation project(':xcSupportBle')
 }
