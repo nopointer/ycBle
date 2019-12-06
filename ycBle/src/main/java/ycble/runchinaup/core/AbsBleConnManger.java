@@ -33,7 +33,7 @@ import static ycble.runchinaup.BleCfg.npBleTag;
 /**
  * 抽象的ble连接管理
  */
-public final class AbsBleConnManger {
+final class AbsBleConnManger {
 
 
     private BluetoothAdapter bluetoothAdapter = null;
@@ -100,18 +100,16 @@ public final class AbsBleConnManger {
      * @param bluetoothDevice
      */
     protected synchronized void connect(final BluetoothDevice bluetoothDevice) {
-        ycBleLog.e("当前实际连接设备是:" + new Gson().toJson(new String[]{
-                bluetoothDevice.getAddress(), bluetoothDevice.getName()
-        }));
+        ycBleLog.e("当前实际发出连接请求的设备是:" + new Gson().toJson(new String[]{bluetoothDevice.getAddress(), bluetoothDevice.getName()}));
         boolIsInterceptConn = false;
         isHandDisConn = false;
         startConnTime = System.currentTimeMillis();
 
         if (!TextUtils.isEmpty(bluetoothDevice.getName())) {
             if (bluetoothGatt != null) {
-                ycBleLog.e("已经有了缓存了=======");
+                ycBleLog.e("已经有过设备缓存信息=======");
+                refreshCache(context, bluetoothGatt);
             }
-            refreshCache(context, bluetoothGatt);
             bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
         } else {
             ycBleLog.e("名称为空，需要开启一下扫描来缓存一下设备名称");
@@ -222,13 +220,13 @@ public final class AbsBleConnManger {
          * @param newState
          */
         @Override
-        public void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
+        public synchronized void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
 
-            ycBleLog.e("===========================================" + this);
-            ycBleLog.e(status + ":" + newState);
+            ycBleLog.e("==================onConnectionStateChange=========================1");
+            ycBleLog.e("status:" + status + " , newState:" + newState);
             ycBleLog.e(PhoneBleExceptionCode.getPhoneCode(status));
-            ycBleLog.e("===========================================");
+            ycBleLog.e("==================onConnectionStateChange=========================2");
 
             //系统蓝牙挂壁的情况，真不好判断，无法通过代码判断，只能人为通过手动试验，才能知道，目前就收集到一个魅族的手机 ble异常码
             if (PhoneBleExceptionCode.isPhoneBleExcepiton(status)) {
@@ -246,7 +244,6 @@ public final class AbsBleConnManger {
                 ycBleLog.e("================设备连接上了，耗时:" + useTime + "S");
 
                 hasConn = true;
-
 
                 //如果有拦截蓝牙连接的请求，此时一定要断开
                 if (boolIsInterceptConn) {
@@ -281,8 +278,13 @@ public final class AbsBleConnManger {
                             if (boolResult) {
                                 handler.postDelayed(discoverServiceRunnable, 1000);
                             } else {
-                                if (gatt != null) {
-                                    gatt.disconnect();
+                                boolResult = bluetoothGatt.discoverServices();
+                                ycBleLog.e("二次discoverServices结果:" + boolResult);
+                                if (boolResult) {
+                                    handler.postDelayed(discoverServiceRunnable, 1000);
+                                } else {
+                                    bluetoothGatt.disconnect();
+                                    close(bluetoothGatt);
                                 }
                             }
                         } else {
@@ -290,7 +292,7 @@ public final class AbsBleConnManger {
                             handler.removeCallbacks(discoverServiceRunnable);
                         }
                     }
-                }, 500);
+                }, 800);
             } else {
                 ycBleLog.e("没有连接的所有情况====>>>>>>>>");
 
@@ -536,20 +538,18 @@ public final class AbsBleConnManger {
         return writeResult;
     }
 
-    //=====================================================
-    //雷打不动的方法，不需要修改什么==================================================
-    //=====================================================
+
     //刷新缓存
     public static void refreshCache(Context context, BluetoothGatt gatt) {
         final BluetoothManager manager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         final List<BluetoothDevice> devices = manager.getConnectedDevices(BluetoothProfile.GATT);
         ycBleLog.e(npBleTag + "当前连接列表里面，设备连接个数:" + devices.size());
         for (BluetoothDevice b : devices) {
-            ycBleLog.d(npBleTag + b.getAddress());
+            ycBleLog.e("系统连接中的设备:" + npBleTag + b.getAddress() + " /// " + b.getName());
         }
         try {
             if (gatt == null) {
-                ycBleLog.e("gatt======null");
+                ycBleLog.e("gatt======null,刷新无效");
                 return;
             }
             BluetoothGatt localBluetoothGatt = gatt;
@@ -580,7 +580,7 @@ public final class AbsBleConnManger {
 
     //获取设备的连接列表
     public static List<BluetoothDevice> connDeviceList(Context context) {
-        ycBleLog.d(npBleTag + "读取连接的蓝牙设备");
+        ycBleLog.e(npBleTag + "读取当前系统连接的蓝牙设备");
         if (context == null) {
             return null;
         }
@@ -590,7 +590,7 @@ public final class AbsBleConnManger {
         }
         final List<BluetoothDevice> devices = manager.getConnectedDevices(BluetoothProfile.GATT);
         for (BluetoothDevice device : devices) {
-            ycBleLog.d("debug==>device：===>" + device.getAddress() + "==" + device.getName());
+            ycBleLog.e("debug==>device：===>" + device.getAddress() + "==" + device.getName());
         }
         return devices;
     }

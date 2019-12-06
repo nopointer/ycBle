@@ -3,7 +3,7 @@ package ycble.runchinaup.core;
 import java.io.Serializable;
 
 //超时助手
-public final class TimeOutHelper implements Serializable {
+final class TimeOutHelper implements Serializable {
 
     //发送的数据
     private String strData;

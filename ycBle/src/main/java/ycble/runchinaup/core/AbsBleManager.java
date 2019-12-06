@@ -160,8 +160,8 @@ public abstract class AbsBleManager {
         }
         connMac = mac;
         ycBleLog.reCreateLogFile(mac);
-        BluetoothDevice bluetoothDevice = AbsBleConnManger.isInConnList(mac, mContext);
         ycBleLog.e("debug===先判断 当前蓝牙设备是不是在其他的app中连接了");
+        BluetoothDevice bluetoothDevice = AbsBleConnManger.isInConnList(mac, mContext);
         if (bluetoothDevice != null) {
             ycBleLog.e("debug===还真被其他应用连接了,那就简单了,直接去拿连接过来就是了");
             connWithSysConn(bluetoothDevice);
@@ -713,55 +713,6 @@ public abstract class AbsBleManager {
 
     }
 
-
-    //=======================================================================
-    //=======================================================================
-    //=====状态接收器=========================================================
-    //=======================================================================
-    //=======================================================================
-//    private BleStateReceiver.BleStateListener bleStateListener = new BleStateReceiver.BleStateListener() {
-//        @Override
-//        public void onBleState(BleStateReceiver.SystemBluetoothState systemBluetoothState, BluetoothDevice bluetoothDevice) {
-//
-//            if (isOTAMode()) {
-//                ycBleLog.e("当前是OTA状态,打印一下状态就好了" + systemBluetoothState + "-" + bluetoothDevice.getAddress());
-//            }
-//
-//            if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateOffBle) {
-//                ycBleLog.e("debug===蓝牙关闭，也算手动断开===>");
-//                isConnectIng = false;
-//                clearSomeFlag();
-//                timeOutHandler.removeCallbacksAndMessages(null);
-//                timeOutHelperHashMap.clear();
-//                withOnHandDisConn();
-//                onHandDisConn();
-//            } else if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateDisConn) {
-//                isConn = false;
-//                isConnectIng = false;
-//                ycBleLog.e("debug==>蓝牙断开了，可能是手动的也有可能是异常断开");
-//                clearSomeFlag();
-//                timeOutHandler.removeCallbacksAndMessages(null);
-//                timeOutHelperHashMap.clear();
-//                if (absBleConnManger.isHandDisConn()) {
-//                    ycBleLog.e("debug===手动断开连接");
-//                    withOnHandDisConn();
-//                    onHandDisConn();
-//                } else {
-//                    ycBleLog.e("debug===设备异常断开");
-//                    withOnConnException();
-//                    onConnException();
-//                }
-//                //已经断开了，回调已经给了，修改手动断开的标志位为false
-//                absBleConnManger.setHandDisConn(false);
-//            } else if (systemBluetoothState == BleStateReceiver.SystemBluetoothState.StateOnBle) {
-//                isConnectIng = false;
-//                ycBleLog.e("debug===系统蓝牙打开了");
-//                timeOutHandler.removeCallbacksAndMessages(null);
-//                timeOutHelperHashMap.clear();
-//                onBleOpen();
-//            }
-//        }
-//    };
 
     //=======================================================================
     //=======================================================================

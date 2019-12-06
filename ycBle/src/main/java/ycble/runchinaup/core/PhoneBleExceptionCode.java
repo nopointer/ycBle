@@ -15,10 +15,9 @@ public class PhoneBleExceptionCode {
 
     public static String getPhoneCode(int code) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(PhoneDeviceUtil.getDeviceBrand()).append("_A_");
-        stringBuilder.append(PhoneDeviceUtil.getSystemModel()).append("_A_");
-        stringBuilder.append(PhoneDeviceUtil.getSystemVersion()).append("_A_");
-        stringBuilder.append(code);
+        stringBuilder.append("手机厂商:" + PhoneDeviceUtil.getDeviceBrand()).append("   ");
+        stringBuilder.append("手机型号:" + PhoneDeviceUtil.getSystemModel()).append("   ");
+        stringBuilder.append("安卓版本:" + PhoneDeviceUtil.getSystemVersion());
         return stringBuilder.toString();
     }
 
