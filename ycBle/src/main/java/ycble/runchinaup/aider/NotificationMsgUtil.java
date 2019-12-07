@@ -79,10 +79,11 @@ public final class NotificationMsgUtil {
 
     /**
      * 关闭监听通知栏的服务
+     * 如果调用这个方法 会导致通知栏监听里面没有这个app的选项
      *
      * @param context
      */
-    public static void closeService(Context context) {
+    private static void closeService(Context context) {
         ComponentName thisComponent = new ComponentName(context, NPNotificationService.class);
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
@@ -97,17 +98,23 @@ public final class NotificationMsgUtil {
      * @return true代表正在运行，false代表服务没有正在运行
      */
     public static boolean isServiceExisted(Context context, Class clazz) {
-        String className = clazz.getName();
+
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> serviceList = activityManager.getRunningServices(Integer.MAX_VALUE);
         if (!(serviceList.size() > 0)) {
             return false;
         }
 
+        String className = clazz.getName();
+        String packageName = context.getPackageName();
+        ycBleLog.e("className====>" + "" + context.getPackageName() + "///" + className);
+
         for (int i = 0; i < serviceList.size(); i++) {
             ActivityManager.RunningServiceInfo serviceInfo = serviceList.get(i);
             ComponentName serviceName = serviceInfo.service;
-            if (serviceName.getClassName().equals(className)) {
+            if (serviceName.getPackageName().equalsIgnoreCase(packageName) && serviceName.getClassName().equals(className)) {
+                ycBleLog.e("开启了通知监听====>" + "" + context.getPackageName() + "///" + className);
+//                ycBleLog.e(" serviceInfo.getPackageName===>" + serviceName.getPackageName());
                 return true;
             }
         }

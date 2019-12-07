@@ -73,7 +73,11 @@ public class ycBleLog {
         }
         if (allowWriteLogToLocalFile) {
             String dateTime = smp.format(new Date());
-            writeFile(dateTime + "  " + content);
+            try {
+                writeFile(dateTime + "  " + content);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

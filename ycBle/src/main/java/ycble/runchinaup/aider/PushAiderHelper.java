@@ -34,7 +34,7 @@ public final class PushAiderHelper {
                 @Override
                 public void run() {
                     if (NotificationMsgUtil.isServiceExisted(context, NPNotificationService.class)) {
-                        ycBleLog.e("如果5秒后没有启动服务，那么就开启service");
+                        ycBleLog.e("如果3秒后没有启动服务，那么就开启service");
                         Intent intent = new Intent(context, NPNotificationService.class);
                         context.startService(intent);
                         NotificationMsgUtil.reStartNotifyListenService(context);
@@ -42,7 +42,7 @@ public final class PushAiderHelper {
                         ycBleLog.e("监听服务已经开启");
                     }
                 }
-            }, 2 * 1000);
+            }, 3 * 1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +74,6 @@ public final class PushAiderHelper {
         try {
             Intent intent = new Intent(context, NPNotificationService.class);
             context.stopService(intent);
-            NotificationMsgUtil.closeService(context);
             handler.removeCallbacksAndMessages(null);
         } catch (Exception e) {
             e.printStackTrace();
