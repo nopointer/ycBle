@@ -1,13 +1,9 @@
 package ycble.runchinaup.core;
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,8 +34,15 @@ public class BleScanner {
         return bleScanner;
     }
 
-    protected static boolean isShowScanLog = true;
+    private boolean isShowScanLog = true;
 
+    public boolean isShowScanLog() {
+        return isShowScanLog;
+    }
+
+    public void setShowScanLog(boolean showScanLog) {
+        isShowScanLog = showScanLog;
+    }
 
     protected static Context mContext;
 
@@ -128,14 +131,14 @@ public class BleScanner {
                 @Override
                 public void onBatchScanResults(@NonNull final List<ScanResult> results) {
                     super.onBatchScanResults(results);
-                    ycBleLog.i("====onScanResult====>批量==>" + results.size());
+                    ycBleLog.e("====onScanResult====>批量==>" + results.size());
                     cachedThreadPool.execute(new Runnable() {
                         @Override
                         public void run() {
                             for (ScanResult result : results) {
                                 BleDevice bleDevice = BleDevice.parserFromScanData(result.getDevice(), result.getScanRecord().getBytes(), result.getRssi());
                                 if (isShowScanLog) {
-                                    ycBleLog.i("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
+                                    ycBleLog.e("====onScanResult====>" + bleDevice.toString() + (bleDeviceFilter == null));
                                 }
                                 if (bleDeviceFilter != null) {
                                     if (bleDeviceFilter.filter(bleDevice)) {
@@ -246,8 +249,6 @@ public class BleScanner {
             e.printStackTrace();
         }
     }
-
-
 
 
 }

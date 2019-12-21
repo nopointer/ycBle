@@ -16,10 +16,4 @@ public class ycBleSDK {
 
 
 
-
-    public static void setScanLog(boolean enable) {
-        BleScanner.isShowScanLog = enable;
-    }
-
-
 }

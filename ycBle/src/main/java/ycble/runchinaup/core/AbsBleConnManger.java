@@ -110,7 +110,9 @@ final class AbsBleConnManger {
                 ycBleLog.e("已经有过设备缓存信息=======");
                 refreshCache(context, bluetoothGatt);
             }
-            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+            connGatt(bluetoothDevice);
+            int clientIf = getClientIf(bluetoothGatt);
+            ycBleLog.e("getClientIf====>" + clientIf);
         } else {
             ycBleLog.e("名称为空，需要开启一下扫描来缓存一下设备名称");
             hadScanDeviceFlag = true;
@@ -247,10 +249,11 @@ final class AbsBleConnManger {
 
                 //如果有拦截蓝牙连接的请求，此时一定要断开
                 if (boolIsInterceptConn) {
-                    ycBleLog.e("================有拦截请求，此处断开");
+                    ycBleLog.e("================有拦截请求，（500毫秒后执行）");
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            ycBleLog.e("================有拦截请求，时间到 开始执行");
                             gatt.disconnect();
                         }
                     }, 500);
@@ -320,7 +323,7 @@ final class AbsBleConnManger {
                 }
 
                 boolIsInterceptConn = false;
-                bluetoothGatt.disconnect();
+//                bluetoothGatt.disconnect();
                 close(bluetoothGatt);
 
                 if (hasConn) {
@@ -698,6 +701,14 @@ final class AbsBleConnManger {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 bluetoothGatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
             }
+        }
+    }
+
+    private void connGatt(BluetoothDevice bluetoothDevice){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+        } else {
+            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
         }
     }
 

@@ -1,6 +1,8 @@
 package ycble.runchinaup.ota.absimpl.xc;
 
 
+import ycble.runchinaup.log.ycBleLog;
+
 public class Crc32 {
     public static final long CRC32_POLY_VAL = 0x04C11DB7L;
     public static final long CRC32_INIT_VAL = 0xFFFFFFFFL;
@@ -104,6 +106,8 @@ public class Crc32 {
 //    }
 
    public long  crc32_calc(long crc, byte[] input, int len) {
+       ycBleLog.e("crc===>"+crc);
+       ycBleLog.e("len===>"+len);
        long crc32 = crc;
         for (int i = 0; i < len; i++) {
             long a=(crc32 ^ input[i]) & 0xFF;
