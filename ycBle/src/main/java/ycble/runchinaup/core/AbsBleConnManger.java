@@ -108,7 +108,7 @@ final class AbsBleConnManger {
         if (!TextUtils.isEmpty(bluetoothDevice.getName())) {
             if (bluetoothGatt != null) {
                 ycBleLog.e("已经有过设备缓存信息=======");
-                refreshCache(context, bluetoothGatt);
+//                refreshCache(context, bluetoothGatt);
             }
             connGatt(bluetoothDevice);
             int clientIf = getClientIf(bluetoothGatt);
