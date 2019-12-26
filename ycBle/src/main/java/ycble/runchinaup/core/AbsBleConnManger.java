@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import ycble.runchinaup.core.callback.ScanListener;
-import ycble.runchinaup.device.BleDevice;
 import ycble.runchinaup.exception.BleUUIDNullException;
 import ycble.runchinaup.log.ycBleLog;
 import ycble.runchinaup.util.BleUtil;
@@ -115,33 +113,34 @@ final class AbsBleConnManger {
             ycBleLog.e("getClientIf====>" + clientIf);
         } else {
             ycBleLog.e("名称为空，需要开启一下扫描来缓存一下设备名称");
-            hadScanDeviceFlag = true;
-            BleScanner.getInstance().registerScanListener(new ScanListener() {
-                @Override
-                public void onScan(BleDevice bleDevice) {
-                    ycBleLog.i("hadScanDeviceFlag=====>" + hadScanDeviceFlag + "///扫描到的设备:" + new Gson().toJson(bleDevice));
-                    if (hadScanDeviceFlag) {
-                        if (bleDevice != null && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
-                            BleScanner.getInstance().unRegisterScanListener(this);
-                            hadScanDeviceFlag = false;
-                            BleScanner.getInstance().stopScan();
-                            ycBleLog.e("扫描到设备了，停止扫描，然后再连接");
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
-                                }
-                            }, 2000);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(int code) {
-
-                }
-            });
-            BleScanner.getInstance().startScan();
+//            hadScanDeviceFlag = true;
+            bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+//            BleScanner.getInstance().registerScanListener(new ScanListener() {
+//                @Override
+//                public void onScan(BleDevice bleDevice) {
+//                    ycBleLog.i("hadScanDeviceFlag=====>" + hadScanDeviceFlag + "///扫描到的设备:" + new Gson().toJson(bleDevice));
+//                    if (hadScanDeviceFlag) {
+//                        if (bleDevice != null && bleDevice.getMac().equalsIgnoreCase(bluetoothDevice.getAddress())) {
+//                            BleScanner.getInstance().unRegisterScanListener(this);
+//                            hadScanDeviceFlag = false;
+//                            BleScanner.getInstance().stopScan();
+//                            ycBleLog.e("扫描到设备了，停止扫描，然后再连接");
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    bluetoothGatt = bluetoothDevice.connectGatt(context, false, gattCallback);
+//                                }
+//                            }, 2000);
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(int code) {
+//
+//                }
+//            });
+//            BleScanner.getInstance().startScan();
         }
     }
 
